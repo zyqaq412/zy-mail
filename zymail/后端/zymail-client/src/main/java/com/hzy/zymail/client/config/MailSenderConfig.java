@@ -27,10 +27,11 @@ public class MailSenderConfig {
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost(configProperties.getHost());
-        javaMailSender.setUsername(configProperties.getUsername());
-        javaMailSender.setPassword(configProperties.getPassword());
+        javaMailSender.setHost(configProperties.getMail().getHost());
+        javaMailSender.setUsername(configProperties.getMail().getUsername());
+        javaMailSender.setPassword(configProperties.getMail().getPassword());
         javaMailSender.setDefaultEncoding("utf-8");
         return javaMailSender;
     }
+
 }

@@ -34,7 +34,7 @@ public class ZymailClient {
         //邮件内容
         message.setText(toEmail.getContent());
 
-        message.setFrom(configProperties.getUsername());
+        message.setFrom(configProperties.getMail().getUsername());
 
         javaMailSender.send(message);
     }
