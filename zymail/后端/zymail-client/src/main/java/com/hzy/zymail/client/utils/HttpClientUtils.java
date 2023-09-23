@@ -45,7 +45,7 @@ public class HttpClientUtils {
             return getResponseStr(response);
         }
     }
-    public String put(String url,String data) throws Exception {
+    public  String put(String url, String data) throws Exception {
         HttpPut httpPut = new HttpPut(url);
         httpPut.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
         try (CloseableHttpResponse response = httpClient.execute(httpPut)) {

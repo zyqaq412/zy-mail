@@ -2,6 +2,7 @@ package com.hzy.zymail.client.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * @title: ConfigProperties
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @Version 1.0
  */
 @Data
+@Component
 @ConfigurationProperties(prefix = "zymail")
 public class ConfigProperties {
 
