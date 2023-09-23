@@ -1,0 +1,21 @@
+server:
+  # 项目端口号
+  port: 8888
+
+spring:
+  application:
+    name: zymail-server
+  # redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+zymail:
+  app-id: zymail-server
+  admin:
+    username: admin
+    password: admin
+  mail:
+    host: smtp.163.com
+    username: huangzheyu2024@163.com
+    password: ZZIGGUATBITQVDJC
