@@ -12,7 +12,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "zymail")
 public class ConfigProperties {
-    private String host;
-    private String username;
-    private String password;
+
+    private String appId;
+
+    private MailProperties mail = new MailProperties();
+
+    private ServerProperties server = new ServerProperties();
+
+
+    @Data
+    public class MailProperties {
+
+        private String host;
+
+        private String username;
+
+        private String password;
+
+    }
+
+    @Data
+    public class ServerProperties {
+        private String url;
+    }
 }
