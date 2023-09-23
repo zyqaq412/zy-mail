@@ -1,11 +1,13 @@
 package com.hzy.server.aop;
 
+import com.hzy.server.annotion.SystemLog;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -31,6 +33,10 @@ public class LoggerAop {
     public void doBefore(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest httpServletRequest = attributes.getRequest();
+        // 获取被增强方法上的注解对象
+        SystemLog systemLog = getSystemLog(joinPoint);
+        log.info("接口描述   : {}", systemLog.value());
+        log.info("URL : " + httpServletRequest.getRequestURL().toString());
         log.info("URL : " + httpServletRequest.getRequestURL().toString());
         log.info("HTTP_METHOD : " + httpServletRequest.getMethod());
         log.info("IP : " + httpServletRequest.getRemoteAddr());
@@ -44,5 +50,9 @@ public class LoggerAop {
     @AfterReturning(returning = "ret", pointcut = "controllerLog()")
     public void doAfterReturning(Object ret) {
         log.info("RESPONSE : " + ret);
+    }
+    private SystemLog getSystemLog(JoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        return signature.getMethod().getAnnotation(SystemLog.class);
     }
 }
