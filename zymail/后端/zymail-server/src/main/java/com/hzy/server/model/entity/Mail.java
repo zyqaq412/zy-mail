@@ -59,6 +59,6 @@ public class Mail implements Serializable {
      * crontab表达式
      */
     @TableField(exist = false)// 该字段在表中不存在
-    private String crontab;
+    private String cron;
 
 }

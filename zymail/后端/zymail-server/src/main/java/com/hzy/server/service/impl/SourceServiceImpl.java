@@ -1,6 +1,6 @@
 package com.hzy.server.service.impl;
 
-import com.hzy.server.constant.RedisKeyConstant;
+import com.hzy.server.constant.SystemConstant;
 import com.hzy.server.model.entity.Source;
 import com.hzy.server.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class SourceServiceImpl implements SourceService {
                 StringUtils.isNotBlank(source.getUsername()) &&
                 StringUtils.isNotBlank(source.getUrl())) {
             String key = source.getAppId();
-            redisCache.setCacheMapValue(RedisKeyConstant.SOURCES_KEY,key,source);
+            redisCache.setCacheMapValue(SystemConstant.SOURCES_KEY,key,source);
             log.info(key+"接入成功");
         }
     }

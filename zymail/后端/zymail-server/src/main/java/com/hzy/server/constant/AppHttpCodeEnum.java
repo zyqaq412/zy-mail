@@ -10,7 +10,8 @@ public enum AppHttpCodeEnum {
     // 成功
     SUCCESS(200,"操作成功"),
 
-    SYSTEM_ERROR(500,"出现错误");
+    SYSTEM_ERROR(500,"出现错误"),
+    QUARTZ_ERROR(510, "定时任务调度失败");
 
 
 

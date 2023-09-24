@@ -1,7 +1,7 @@
 package com.hzy.server.api;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hzy.server.constant.RedisKeyConstant;
+import com.hzy.server.constant.SystemConstant;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.model.entity.Source;
 import com.hzy.server.utils.RedisCache;
@@ -27,7 +27,7 @@ public class ZymailClientApi {
     public void sendEmail(Mail mail) throws IOException {
 
         try {
-            Source source = redisCache.getCacheMapValue(RedisKeyConstant.SOURCES_KEY,
+            Source source = redisCache.getCacheMapValue(SystemConstant.SOURCES_KEY,
                     mail.getSource());
             httpClientUtils.post(source.getUrl() + "/mails", JSONObject.toJSONString(mail));
         } catch (Exception e) {

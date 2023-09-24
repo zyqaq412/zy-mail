@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(RuntimeException.class)
     public Result runtimeExceptionHandler(Exception ex) {
-        log.error("运行时异常 -- 错误信息：" + ex.getMessage());
+        log.error("运行时异常 -- 错误信息："  );
+        ex.printStackTrace();
         return Result.errorResult(500, ex.getMessage());
     }
 
