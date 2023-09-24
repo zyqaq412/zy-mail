@@ -1,8 +1,10 @@
 package com.hzy.server.service.impl;
 
 import com.hzy.server.config.ConfigProperties;
+import com.hzy.server.job.LocalSendMailJob;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.LocalMailService;
+import com.hzy.server.service.QuartzService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @title: localMailServiceImpl
@@ -23,15 +28,35 @@ public class LocalMailServiceImpl implements LocalMailService {
     private JavaMailSender javaMailSender;
     @Autowired
     private ConfigProperties configProperties;
+    @Autowired
+    private QuartzService quartzService;
+
     @Override
     public void sendMail(Mail mail) {
-        if (!mail.getTimer()){
+        if (!mail.getTimer()) {
             // 未定时直接发送
             sendHtmlMail(mail.getToUser(), mail.getSubject(), mail.getContent());
-        }else {
+        } else {
             // TODO 本地调度源定时邮件
-
+            createSendMailJob(mail);
         }
+    }
+
+    // 创建 定时任务
+    private void createSendMailJob(Mail mail) {
+        Map<String, Mail> params = new HashMap<>();
+        params.put("mail", mail);
+        String uniKey = UUID.randomUUID().toString();
+        // 组设置为调度源appId
+        quartzService.addJob("sendMail-" + uniKey,
+                mail.getSource(),
+                "sendMail-" + uniKey,
+                mail.getSource(),
+                LocalSendMailJob.class,
+                mail.getCron(),
+                mail.getStartTime(),
+                mail.getEndTime(),
+                params);
     }
 
     @Override
