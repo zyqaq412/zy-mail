@@ -5,6 +5,7 @@ import com.hzy.server.job.LocalSendMailJob;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.LocalMailService;
 import com.hzy.server.service.QuartzService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,6 +24,7 @@ import java.util.UUID;
  * @Version 1.0
  */
 @Service
+@Slf4j
 public class LocalMailServiceImpl implements LocalMailService {
     @Autowired
     private JavaMailSender javaMailSender;
@@ -47,7 +49,7 @@ public class LocalMailServiceImpl implements LocalMailService {
         Map<String, Mail> params = new HashMap<>();
         params.put("mail", mail);
         String uniKey = UUID.randomUUID().toString();
-        // 组设置为调度源appId
+        log.info("添加本地任务");
         quartzService.addJob("sendMail-" + uniKey,
                 mail.getSource(),
                 "sendMail-" + uniKey,

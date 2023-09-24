@@ -24,10 +24,10 @@ public class LocalSendMailJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        log.info("定时任务开始执行");
+        log.info("本地-定时任务开始执行");
         JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
         Mail mail = (Mail) dataMap.get("mail");
         localMailService.sendHtmlMail(mail.getToUser(), mail.getSubject(), mail.getContent());
-        log.info("定时任务执行完毕");
+        log.info("本地-定时任务执行完毕");
     }
 }

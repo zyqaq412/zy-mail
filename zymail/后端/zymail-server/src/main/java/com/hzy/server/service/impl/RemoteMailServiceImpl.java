@@ -1,10 +1,11 @@
 package com.hzy.server.service.impl;
 
 import com.hzy.server.api.ZymailClientApi;
-import com.hzy.server.job.LocalSendMailJob;
+import com.hzy.server.job.RemoteSendMailJob;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.QuartzService;
 import com.hzy.server.service.RemoteMailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
  * @Version 1.0
  */
 @Service
+@Slf4j
 public class RemoteMailServiceImpl implements RemoteMailService {
 
     @Autowired
@@ -46,12 +48,12 @@ public class RemoteMailServiceImpl implements RemoteMailService {
         Map<String, Mail> params = new HashMap<>();
         params.put("mail", mail);
         String uniKey = UUID.randomUUID().toString();
-        // 组设置为调度源appId
+        log.info("添加远程任务");
         quartzService.addJob("sendMail-" + uniKey,
                 mail.getSource(),
                 "sendMail-" + uniKey,
                 mail.getSource(),
-                LocalSendMailJob.class,
+                RemoteSendMailJob.class,
                 mail.getCron(),
                 mail.getStartTime(),
                 mail.getEndTime(),
