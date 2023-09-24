@@ -31,8 +31,8 @@ public class HttpClientConfig {
     @Bean
     public RequestConfig requestConfig() {
         return RequestConfig.custom()
-                .setConnectTimeout(5000) // 连接超时时间
-                .setSocketTimeout(5000) // 请求超时时间
+                .setConnectTimeout(15000) // 连接超时时间
+                .setSocketTimeout(15000) // 请求超时时间
                 .build();
     }
 

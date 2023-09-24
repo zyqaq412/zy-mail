@@ -2,13 +2,14 @@ package com.hzy.zymail.client.api;
 
 import com.hzy.zymail.client.config.ConfigProperties;
 import com.hzy.zymail.client.config.MailSenderConfig;
-import com.hzy.zymail.client.model.dto.ToEmail;
+import com.hzy.zymail.client.model.entity.Mail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.mail.internet.MimeMessage;
 
@@ -28,18 +29,19 @@ public class ZymailClient {
     @Autowired
     private ConfigProperties configProperties;
 
-    public void sendMail(ToEmail toEmail){
+    @Async
+    public void sendMail(Mail mail){
         try {
             // 创建简单邮件消息
             MimeMessage message  = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             //谁要接收
             helper.setFrom(configProperties.getMail().getUsername());
-            helper.setTo(toEmail.getToUser());
+            helper.setTo(mail.getToUser());
             //邮件标题
-            helper.setSubject(toEmail.getSubject());
+            helper.setSubject(mail.getSubject());
             //邮件内容
-            helper.setText(toEmail.getContent(),true);
+            helper.setText(mail.getContent(),true);
             // 可以添加附件
             // helper.addAttachment("附件名称", new File("附件路径"));
             javaMailSender.send(message);
