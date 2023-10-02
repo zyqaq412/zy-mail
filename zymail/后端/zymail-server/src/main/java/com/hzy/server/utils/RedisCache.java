@@ -241,4 +241,13 @@ public class RedisCache
         return redisTemplate.keys(pattern);
     }
 
+    /**
+     *  获取hash结构的所有hkeys
+     * @param key
+     * @return
+     */
+    public Collection<String> getHashHkeys(final String key)
+    {
+        return redisTemplate.opsForHash().keys(key);
+    }
 }

@@ -4,10 +4,7 @@ import com.hzy.server.annotion.SystemLog;
 import com.hzy.server.model.entity.Source;
 import com.hzy.server.service.SourceService;
 import com.hzy.server.utils.Result;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -27,6 +24,11 @@ public class SourceController {
     public Result addSource(@RequestBody Source source) {
         sourceService.addSource(source);
         return Result.okResult();
+    }
+    @SystemLog("获取调度源列表")
+    @GetMapping
+    public Result getSources(){
+      return sourceService.getList();
     }
 
 }
