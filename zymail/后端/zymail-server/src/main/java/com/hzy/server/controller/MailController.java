@@ -1,8 +1,10 @@
 package com.hzy.server.controller;
 
 import com.hzy.server.config.ConfigProperties;
+import com.hzy.server.model.dto.MailPage;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.LocalMailService;
+import com.hzy.server.service.MailService;
 import com.hzy.server.service.RemoteMailService;
 import com.hzy.server.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +44,12 @@ public class MailController {
             remoteMailService.sendMail(mail);
         }
         return Result.okResult();
+    }
+    @Autowired
+    private MailService mailService;
+    @PostMapping("/list")
+    public Result mailList(@RequestBody MailPage mailPage){
+
+        return mailService.getList(mailPage);
     }
 }
