@@ -1,6 +1,7 @@
 package com.hzy.server.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +21,8 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("mail")
 public class Mail implements Serializable {
-    // 邮件id@TableId
+    // 邮件id
+    @TableId
     private Long emilId;
 
     // 调度源(发件人)
