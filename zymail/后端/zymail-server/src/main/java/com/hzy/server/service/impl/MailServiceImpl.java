@@ -2,12 +2,15 @@ package com.hzy.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hzy.server.constant.SystemConstant;
 import com.hzy.server.mapper.MailMapper;
 import com.hzy.server.model.dto.MailPage;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.model.vo.PageVo;
 import com.hzy.server.service.MailService;
+import com.hzy.server.utils.RedisCache;
 import com.hzy.server.utils.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,5 +35,21 @@ public class MailServiceImpl extends ServiceImpl<MailMapper, Mail> implements Ma
         pageVo.setRows(records);
         pageVo.setTotal(page.getTotal());
         return Result.okResult(pageVo);
+    }
+    @Autowired
+    private RedisCache redisCache;
+
+    @Override
+    public Result getMailById(Long id) {
+        // 先查缓存
+        Mail mail = (Mail)redisCache.getCacheObject(SystemConstant.MAIL_KEY + id);
+        if (mail == null){
+            // 查数据库
+            mail = getById(id);
+            // 创建缓存
+            redisCache.setCacheObject(SystemConstant.MAIL_KEY + id,mail);
+            return Result.okResult(mail);
+        }
+        return Result.okResult(mail);
     }
 }

@@ -8,10 +8,7 @@ import com.hzy.server.service.MailService;
 import com.hzy.server.service.RemoteMailService;
 import com.hzy.server.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @title: MailController
@@ -51,5 +48,10 @@ public class MailController {
     public Result mailList(@RequestBody MailPage mailPage){
 
         return mailService.getList(mailPage);
+    }
+
+    @GetMapping("/{id}")
+    public Result getMailById(@PathVariable("id") Long id){
+        return mailService.getMailById(id);
     }
 }

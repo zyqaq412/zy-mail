@@ -13,6 +13,18 @@ import com.hzy.server.utils.Result;
  * @since 2023-09-24 19:42:16
  */
 public interface MailService extends IService<Mail> {
+    /**
+     *  分页获取邮件列表
+     * @param mailPage
+     * @return
+     */
     Result getList(MailPage mailPage);
+
+    /**
+     *  根据id查看邮件详情
+     * @param id
+     * @return
+     */
+    Result getMailById(Long id);
 }
 

@@ -11,4 +11,5 @@ public class SystemConstant {
     public final static String SOURCES_KEY = "sources";
     // 邮件发送工作 前缀
     public final static String JOB_SEDMAIL = "sendMail-";
+    public final static String MAIL_KEY = "mails_";
 }
