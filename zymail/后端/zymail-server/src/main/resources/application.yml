@@ -21,7 +21,7 @@ spring:
     # 开启雪花算法生成ID
     global-config:
       db-config:
-        id-type: 1
+        # id-type: 1
     # 将字段名大写切换为下划线
         column-underline: true
 zymail:
