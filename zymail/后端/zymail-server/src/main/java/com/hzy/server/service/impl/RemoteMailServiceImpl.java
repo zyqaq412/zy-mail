@@ -3,6 +3,7 @@ package com.hzy.server.service.impl;
 import com.hzy.server.api.ZymailClientApi;
 import com.hzy.server.job.RemoteSendMailJob;
 import com.hzy.server.model.entity.Mail;
+import com.hzy.server.service.MailService;
 import com.hzy.server.service.QuartzService;
 import com.hzy.server.service.RemoteMailService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -28,12 +30,16 @@ public class RemoteMailServiceImpl implements RemoteMailService {
     private ZymailClientApi zymailClientApi;
     @Autowired
     private QuartzService quartzService;
-
+    @Autowired
+    private MailService mailService;
     @Override
     public void sendMail(Mail mail) {
         if (!mail.getTimer()){
             try {
                 zymailClientApi.sendEmail(mail);
+
+                mail.setSendTime(new Date());
+                mailService.save(mail);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

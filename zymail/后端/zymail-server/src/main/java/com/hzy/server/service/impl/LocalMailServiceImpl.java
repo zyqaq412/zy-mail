@@ -4,6 +4,7 @@ import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.job.LocalSendMailJob;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.LocalMailService;
+import com.hzy.server.service.MailService;
 import com.hzy.server.service.QuartzService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -32,12 +34,16 @@ public class LocalMailServiceImpl implements LocalMailService {
     private ConfigProperties configProperties;
     @Autowired
     private QuartzService quartzService;
+    @Autowired
+    private MailService mailService;
 
     @Override
     public void sendMail(Mail mail) {
         if (!mail.getTimer()) {
             // 未定时直接发送
             sendHtmlMail(mail.getToUser(), mail.getSubject(), mail.getContent());
+            mail.setSendTime(new Date());
+            mailService.save(mail);
         } else {
             // TODO 本地调度源定时邮件
             createSendMailJob(mail);
