@@ -9,4 +9,10 @@ export default {
       data: mailPage
     })
   },
+  getMailById(id) {
+    return request({
+      url: `${api_name}/${id}`,
+      method: 'get',
+    })
+  }
 }
