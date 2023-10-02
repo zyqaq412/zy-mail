@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="a">
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item class="input" label="主题">
+      <el-form ref="form" :rules="rules" :model="form" label-width="80px">
+        <el-form-item class="input" label="主题" prop="subject">
           <el-input v-model="form.subject"></el-input>
         </el-form-item>
-        <el-form-item class="input" label="收件人">
+        <el-form-item  class="input" label="收件人" prop="toUser">
           <el-input v-model="form.toUser"></el-input>
         </el-form-item>
         <el-form-item label="定时">
@@ -28,7 +28,7 @@
           ></el-date-picker>
         </el-form-item>
 
-        <el-form-item label="调度源" prop="source">
+        <el-form-item label="调度源"  prop="source">
           <el-radio-group v-model="form.source">
             <el-radio v-for="appId in appIds" :label="appId">{{appId}}</el-radio>
           </el-radio-group>
@@ -72,6 +72,17 @@ export default {
         timer: false,
         content: '',
         source:''
+      },
+      rules: {
+        subject: [
+          { required: true, message: '请输入邮件主题', trigger: 'blur' }
+        ],
+        toUser: [
+          { required: true, message: '请选择接收者邮箱', trigger: 'blur' }
+        ],
+        source: [
+          { required: true, message: '请选择调度源', trigger: 'change' }
+        ],
       },
       toolbars: {
         bold: true, // 粗体
@@ -121,35 +132,45 @@ export default {
       })
     },
     sendMail() {
-      if(this.form.timer){
-        let temp = this.$notify({
-          title: '提示',
-          message: '定时任务创建中，请等待',
-          duration: 0
-        });
-        api.sendMail(this.form).then(()=>{
-          temp.close()
-          this.form = [];
-          this.$message({
-            message: '任务创建成功',
-            type: 'success'
-          });
-        })
-      }else {
-        let temp = this.$notify({
-          title: '提示',
-          message: '消息发送中，请等待',
-          duration: 0
-        });
-        api.sendMail(this.form).then(()=>{
-          temp.close()
-          this.form = [];
-          this.$message({
-            message: '邮件发送成功',
-            type: 'success'
-          });
-        })
-      }
+      // 在发送邮件的方法中可以调用表单的验证方法
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          // 表单验证通过，执行发送邮件的逻辑
+          if(this.form.timer){
+            let temp = this.$notify({
+              title: '提示',
+              message: '定时任务创建中，请等待',
+              duration: 0
+            });
+            api.sendMail(this.form).then(()=>{
+              temp.close()
+              this.form = [];
+              this.$message({
+                message: '任务创建成功',
+                type: 'success'
+              });
+            })
+          }else {
+            let temp = this.$notify({
+              title: '提示',
+              message: '消息发送中，请等待',
+              duration: 0
+            });
+            api.sendMail(this.form).then(()=>{
+              temp.close()
+              this.form = [];
+              this.$message({
+                message: '邮件发送成功',
+                type: 'success'
+              });
+            })
+          }
+        } else {
+          // 表单验证失败，不执行发送邮件的逻辑
+          return false;
+        }
+      });
+
     },
     addImg(pos, file) {
       console.log("pos",pos)
