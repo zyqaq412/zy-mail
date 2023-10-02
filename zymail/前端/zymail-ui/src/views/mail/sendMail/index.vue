@@ -51,6 +51,7 @@
 </template>
 <script>
 import mavonEditor from 'mavon-editor'
+import marked from 'marked';
 import 'mavon-editor/dist/css/index.css'
 import api from '@/api/mail/sendMail'
 import source from "@/api/source/source";
@@ -135,6 +136,8 @@ export default {
       // 在发送邮件的方法中可以调用表单的验证方法
       this.$refs.form.validate(valid => {
         if (valid) {
+          // 将markdown格式转为html
+          this.form.content = marked(this.form.content);
           // 表单验证通过，执行发送邮件的逻辑
           if(this.form.timer){
             let temp = this.$notify({
