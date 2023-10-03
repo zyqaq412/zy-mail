@@ -12,4 +12,5 @@ public class SystemConstant {
     // 邮件发送工作 前缀
     public final static String JOB_SEDMAIL = "sendMail-";
     public final static String MAIL_KEY = "mails:mailId-";
+    public final static Integer CACHE_EXPIRE_TIME = 1000*60*30;
 }

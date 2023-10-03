@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * (Mail)表服务实现类
@@ -36,18 +37,20 @@ public class MailServiceImpl extends ServiceImpl<MailMapper, Mail> implements Ma
         pageVo.setTotal(page.getTotal());
         return Result.okResult(pageVo);
     }
+
     @Autowired
     private RedisCache redisCache;
 
     @Override
     public Result getMailById(Long id) {
         // 先查缓存
-        Mail mail = (Mail)redisCache.getCacheObject(SystemConstant.MAIL_KEY + id);
-        if (mail == null){
+        Mail mail = (Mail) redisCache.getCacheObject(SystemConstant.MAIL_KEY + id);
+        if (mail == null) {
             // 查数据库
             mail = getById(id);
             // 创建缓存
-            redisCache.setCacheObject(SystemConstant.MAIL_KEY + id,mail);
+            redisCache.setCacheObject(SystemConstant.MAIL_KEY + id, mail,
+                    SystemConstant.CACHE_EXPIRE_TIME, TimeUnit.MINUTES);
             return Result.okResult(mail);
         }
         return Result.okResult(mail);
