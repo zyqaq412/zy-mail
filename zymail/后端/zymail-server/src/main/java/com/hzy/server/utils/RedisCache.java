@@ -250,4 +250,13 @@ public class RedisCache
     {
         return redisTemplate.opsForHash().keys(key);
     }
+    /**
+     *  获取hash结构的一个key的所有数据
+     * @param key
+     * @return
+     */
+    public Map<String,Object> getHashAll(final String key)
+    {
+        return redisTemplate.opsForHash().entries(key);
+    }
 }

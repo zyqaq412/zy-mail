@@ -1,7 +1,9 @@
 package com.hzy.server.api;
 
 import com.alibaba.fastjson.JSONObject;
+import com.hzy.server.constant.AppHttpCodeEnum;
 import com.hzy.server.constant.SystemConstant;
+import com.hzy.server.exception.SystemException;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.model.entity.Source;
 import com.hzy.server.utils.RedisCache;
@@ -25,13 +27,23 @@ public class ZymailClientApi {
     private HttpClientUtils httpClientUtils;
 
     public void sendEmail(Mail mail) throws IOException {
-
         try {
+            heartCheck(mail.getSource());
             Source source = redisCache.getCacheMapValue(SystemConstant.SOURCES_KEY,
                     mail.getSource());
             httpClientUtils.post(source.getUrl() + "/mails", JSONObject.toJSONString(mail));
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+    public void heartCheck(String appId) {
+        try {
+            Source source = redisCache.getCacheMapValue(SystemConstant.SOURCES_KEY,
+                    appId);
+            httpClientUtils.get(source.getUrl() + "/heart");
+        } catch (Exception e) {
+            redisCache.delCacheMapValue(SystemConstant.SOURCES_KEY,appId);
+            throw new SystemException(AppHttpCodeEnum.CLIENT_HEART_CHECK_FAILED);
         }
     }
 }
