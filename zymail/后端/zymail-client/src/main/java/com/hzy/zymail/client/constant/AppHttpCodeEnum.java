@@ -7,6 +7,8 @@ package com.hzy.zymail.client.constant;
  * @Version 1.0
  */
 public enum AppHttpCodeEnum {
+    SERVER_HEART_CHECK_FAILED(0, "客户端心跳检测失败"),
+    SERVER_HEART_CHECK_SUCCESS(1,"客户端心跳检测成功"),
     // 成功
     SUCCESS(200,"操作成功"),
 
