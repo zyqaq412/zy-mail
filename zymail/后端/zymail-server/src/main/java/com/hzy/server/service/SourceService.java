@@ -22,4 +22,9 @@ public interface SourceService {
      * @return
      */
     Result getList();
+
+    /**
+     *  检测调度源连接状态
+     */
+    void sourcesConnectionCheck();
 }

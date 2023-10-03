@@ -7,6 +7,7 @@ import com.hzy.server.exception.SystemException;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.model.entity.Source;
 import com.hzy.server.utils.RedisCache;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.hzy.server.utils.HttpClientUtils;
@@ -20,6 +21,7 @@ import java.io.IOException;
  * @Version 1.0
  */
 @Component
+@Slf4j
 public class ZymailClientApi {
     @Autowired
     private RedisCache redisCache;
@@ -43,6 +45,7 @@ public class ZymailClientApi {
             httpClientUtils.get(source.getUrl() + "/heart");
         } catch (Exception e) {
             redisCache.delCacheMapValue(SystemConstant.SOURCES_KEY,appId);
+            log.info("移除调度源:"+appId);
             throw new SystemException(AppHttpCodeEnum.CLIENT_HEART_CHECK_FAILED);
         }
     }
