@@ -28,4 +28,31 @@ public interface QuartzService {
      */
     void addJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName,
                 Class jobClass, String cron, Date startTime, Date endTime, Map<String, Mail> params);
+
+    /**
+     * 移除一个任务
+     * @param jobName
+     * @param jobGroupName
+     * @param triggerName
+     * @param triggerGroupName
+     */
+    void removeJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName);
+    /**
+     * 暂停一个job
+     * @param jobName
+     * @param jobGroupName
+     */
+    void pauseJob(String jobName, String jobGroupName);
+    /**
+     * 恢复一个job
+     * @param jobName
+     * @param jobGroupName
+     */
+    void resumeJob(String jobName, String jobGroupName);
+
+    /**
+     *  获取调度源状态
+     * @return
+     */
+    int getSchedulerStatus();
 }

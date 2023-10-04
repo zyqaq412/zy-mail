@@ -69,4 +69,60 @@ public class QuartzServiceImpl implements QuartzService {
             }
 
     }
+
+    @Override
+    public void removeJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName) {
+        try {
+
+            TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
+            // 停止触发器
+            scheduler.pauseTrigger(triggerKey);
+            // 移除触发器
+            scheduler.unscheduleJob(triggerKey);
+            // 删除任务
+            scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
+            log.info("删除任务:"+JobKey.jobKey(jobName));
+        } catch (Exception e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
+
+    @Override
+    public void pauseJob(String jobName, String jobGroupName) {
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
+        // 停止触发器
+        try {
+            scheduler.pauseTrigger(triggerKey);
+        } catch (SchedulerException e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
+
+    @Override
+    public void resumeJob(String jobName, String jobGroupName) {
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
+        // 恢复触发器
+        try {
+            scheduler.resumeTrigger(triggerKey);
+        } catch (SchedulerException e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
+
+    @Override
+    public int getSchedulerStatus() {
+        try {
+            if (scheduler.isInStandbyMode()) {
+                return 1;
+            } else if (scheduler.isStarted()) {
+                return 0;
+            } else if (scheduler.isShutdown()) {
+                return 2;
+            } else {
+                return 3;
+            }
+        } catch (Exception e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
 }
