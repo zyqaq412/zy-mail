@@ -34,8 +34,6 @@ public class Mail implements Serializable {
     private String subject;
     // 邮件内容
     private String content;
-    // 是否被保存为模板
-    private Integer isTemplate;
     // 发送时间
     private Date sendTime;
 
