@@ -50,8 +50,21 @@ public class JobController {
         quartzService.removeJob(jobName, jobGroupName, jobName, jobGroupName);
         return Result.okResult();
     }
+    // 获取调度器状态
     @GetMapping("/scheduler/status")
-    public Result<Integer> getSchedulerStatus() {
+    public Result getSchedulerStatus() {
         return Result.okResult(quartzService.getSchedulerStatus());
+    }
+    // 启动调度器
+    @PutMapping("/scheduler/start")
+    public Result startScheduler() {
+        quartzService.startScheduler();
+        return Result.okResult();
+    }
+    // 暂停调度器
+    @PutMapping("/scheduler/pause")
+    public Result pauseScheduler() {
+        quartzService.pauseScheduler();
+        return Result.okResult();
     }
 }

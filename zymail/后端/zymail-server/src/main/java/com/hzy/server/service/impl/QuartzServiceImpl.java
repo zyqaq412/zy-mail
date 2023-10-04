@@ -125,4 +125,26 @@ public class QuartzServiceImpl implements QuartzService {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }
     }
+
+    @Override
+    public void startScheduler() {
+        try {
+            if (!scheduler.isShutdown()) {
+                scheduler.start();
+            }
+        } catch (Exception e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
+
+    @Override
+    public void pauseScheduler() {
+        try {
+            if (!scheduler.isShutdown()) {
+                scheduler.standby();
+            }
+        } catch (Exception e) {
+            throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
+        }
+    }
 }

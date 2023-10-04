@@ -55,4 +55,14 @@ public interface QuartzService {
      * @return
      */
     int getSchedulerStatus();
+
+    /**
+     *  启动调度器
+     */
+    void startScheduler();
+
+    /**
+     *  暂停调度器
+     */
+    void pauseScheduler();
 }
