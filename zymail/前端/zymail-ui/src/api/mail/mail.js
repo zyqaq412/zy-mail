@@ -14,5 +14,18 @@ export default {
       url: `${api_name}/${id}`,
       method: 'get',
     })
+  },
+  saveTemplate(mail) {
+    return request({
+      url: `${api_name}/save`,
+      method: 'post',
+      data: mail
+    })
+  },
+  getTemplates(){
+    return request({
+      url: `${api_name}/`,
+      method: 'get',
+    })
   }
 }
