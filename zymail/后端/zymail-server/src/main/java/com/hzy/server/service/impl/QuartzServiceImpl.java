@@ -1,5 +1,6 @@
 package com.hzy.server.service.impl;
 
+import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.constant.AppHttpCodeEnum;
 import com.hzy.server.exception.SystemException;
 import com.hzy.server.model.entity.Mail;
@@ -27,6 +28,8 @@ public class QuartzServiceImpl implements QuartzService {
     private Scheduler scheduler;
     @Autowired
     private MailLogService logService;
+    @Autowired
+    private ConfigProperties configProperties;
     @Override
     public void addJob(String jobName, String jobGroupName, // 工作名 ， 工作组名(调度源)
                        String triggerName, String triggerGroupName, // 触发器名 ， 触发器组名(调度源)
@@ -68,7 +71,7 @@ public class QuartzServiceImpl implements QuartzService {
                 scheduler.scheduleJob(jobDetail, trigger);
                 log.info("任务设置成功");
                 // 日志管理  添加启动日志
-                logService.info(triggerGroupName, LogTemplate.startJobTemplate(
+                logService.info(configProperties.getAppId(), LogTemplate.startJobTemplate(
                         jobName,jobGroupName,jobClass,cron,startTime,endTime
                 ));
             }catch (Exception e){
@@ -91,7 +94,7 @@ public class QuartzServiceImpl implements QuartzService {
             scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
             log.info("删除任务:"+JobKey.jobKey(jobName));
             // 日志管理  添加删除日志
-            logService.error(jobGroupName,LogTemplate.delJobTemplate(jobName,jobGroupName));
+            logService.error(configProperties.getAppId(),LogTemplate.delJobTemplate(jobName,jobGroupName));
         } catch (Exception e) {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }
@@ -104,7 +107,7 @@ public class QuartzServiceImpl implements QuartzService {
         try {
             scheduler.pauseTrigger(triggerKey);
             // 日志管理  添加暂停日志
-            logService.warning(jobGroupName,LogTemplate.pauseJobTemplate(jobName,jobGroupName));
+            logService.warning(configProperties.getAppId(),LogTemplate.pauseJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }
@@ -117,7 +120,7 @@ public class QuartzServiceImpl implements QuartzService {
         try {
             scheduler.resumeTrigger(triggerKey);
             // 日志管理  添加恢复日志
-            logService.info(jobGroupName,LogTemplate.resumeJobTemplate(jobName,jobGroupName));
+            logService.info(configProperties.getAppId(),LogTemplate.resumeJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }

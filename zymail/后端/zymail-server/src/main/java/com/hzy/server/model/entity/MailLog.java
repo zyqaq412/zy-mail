@@ -25,7 +25,7 @@ public class MailLog  {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    // 调度源
+    // 调度源 记录者
     private String source;
     // 日志级别
     private Integer level;

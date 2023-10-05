@@ -37,7 +37,7 @@ public class LogTemplate {
         return String.format("<div>" +
                         "<p>工作名：%s</p>" +
                         "<p>工作组：%s</p>" +
-                        "<p>恢复！</p>" +
+                        "<p style=\"color: green\">恢复！</p>" +
                         "</div>",
                 jobName, jobGroupName);
     }
@@ -45,7 +45,7 @@ public class LogTemplate {
         return String.format("<div>" +
                         "<p>工作名：%s</p>" +
                         "<p>工作组：%s</p>" +
-                        "<p>暂停！</p>" +
+                        "<p style=\"color: yellow\">暂停！</p>" +
                         "</div>",
                 jobName, jobGroupName);
     }
@@ -53,7 +53,7 @@ public class LogTemplate {
         return String.format("<div>" +
                         "<p>工作名：%s</p>" +
                         "<p>工作组：%s</p>" +
-                        "<p>移除！</p>" +
+                        "<p style=\"color: red\">移除！</p>" +
                         "</div>",
                 jobName, jobGroupName);
     }
@@ -62,7 +62,7 @@ public class LogTemplate {
         return String.format("<div>" +
                         "<p>工作名：%s</p>" +
                         "<p>工作组：%s</p>" +
-                        "<p>完成！</p>" +
+                        "<p style=\"color: green\">完成！</p>" +
                         "<p>工作类型：%s</p>" +
                         "</div>",
                 jobName, jobGroupName, jobClass.getSimpleName());
