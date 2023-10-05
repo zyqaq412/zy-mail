@@ -7,6 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
 /**
  * (MailLog)表实体类
  *
@@ -28,6 +31,7 @@ public class MailLog  {
     private Integer level;
     // 日志内容
     private String content;
+    private Date createTime;
 
 
 

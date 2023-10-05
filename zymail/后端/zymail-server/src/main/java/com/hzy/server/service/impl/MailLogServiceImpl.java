@@ -10,6 +10,7 @@ import com.hzy.server.service.MailLogService;
 import com.hzy.server.utils.Result;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +42,7 @@ public class MailLogServiceImpl extends ServiceImpl<MailLogMapper, MailLog> impl
         log.setSource(appId);
         log.setLevel(level);
         log.setContent(content);
+        log.setCreateTime(new Date());
         save(log);
     }
 
