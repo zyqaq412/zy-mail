@@ -6,11 +6,11 @@ package com.hzy.server.constant;
  * @Date: 2023/9/23 23:15
  * @Version 1.0
  */
-public class SystemConstant {
+public interface SystemConstant {
     // 调度源key
-    public final static String SOURCES_KEY = "sources";
+    String SOURCES_KEY = "sources";
     // 邮件发送工作 前缀
-    public final static String JOB_SEDMAIL = "sendMail-";
-    public final static String MAIL_KEY = "mails:mailId-";
-    public final static Integer CACHE_EXPIRE_TIME = 1000*60*30;
+    String JOB_SENDMAIL = "sendMail-";
+    String MAIL_KEY = "mails:mailId-";
+    Integer CACHE_EXPIRE_TIME = 1000 * 60 * 30;
 }
