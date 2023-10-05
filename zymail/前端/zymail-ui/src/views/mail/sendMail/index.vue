@@ -53,7 +53,7 @@
                         :toolbars="toolbars"
                         :fullscreen="fullscreen"
                         @imgAdd="addImg" />-->
-          <mavon-editor id="edit" v-model="form.content" />
+          <mavon-editor id="edit" v-model="form.tempContent" />
         </el-form-item>
 
         <el-form-item>
@@ -109,6 +109,7 @@ export default {
         timer: false,
         content: '',
         source:'',
+        tempContent:''
       },
       rules: {
         subject: [
@@ -159,12 +160,11 @@ export default {
       // 在发送邮件的方法中可以调用表单的验证方法
       this.$refs.form.validate(valid => {
         if (valid) {
+          // 将markdown格式转为html
+          this.form.content = marked(this.form.tempContent);
           this.template.content = this.form.content;
           this.template.source = this.form.source;
           this.dialogVisible = true;
-          // 将markdown格式转为html
-          this.form.content = marked(this.form.content);
-
           // 表单验证通过，执行发送邮件的逻辑
           if(this.form.timer){
             let temp = this.$notify({
