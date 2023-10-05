@@ -37,7 +37,6 @@ public class LoggerAop {
         SystemLog systemLog = getSystemLog(joinPoint);
         log.info("接口描述   : {}", systemLog.value());
         log.info("URL : " + httpServletRequest.getRequestURL().toString());
-        log.info("URL : " + httpServletRequest.getRequestURL().toString());
         log.info("HTTP_METHOD : " + httpServletRequest.getMethod());
         log.info("IP : " + httpServletRequest.getRemoteAddr());
         Enumeration<String> enu = httpServletRequest.getParameterNames();

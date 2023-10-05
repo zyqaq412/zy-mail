@@ -1,6 +1,7 @@
 package com.hzy.server.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hzy.server.model.dto.MailPage;
 import com.hzy.server.model.entity.MailLog;
 import com.hzy.server.utils.Result;
 
@@ -44,6 +45,14 @@ public interface MailLogService extends IService<MailLog> {
     void warning(String appId, String content);
 
     void info(String appId, String content);
+
+    /**
+     *  分页查询
+     * @param mailPage
+     * @param appId
+     * @return
+     */
+    Result getPageLogs(MailPage mailPage, String appId);
     // endregion
 
 

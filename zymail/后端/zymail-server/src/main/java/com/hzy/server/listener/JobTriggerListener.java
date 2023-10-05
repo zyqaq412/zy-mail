@@ -8,6 +8,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
@@ -17,6 +18,7 @@ import java.util.Date;
  * @Date: 2023/10/5 22:36
  * @Version 1.0
  */
+@Component
 public class JobTriggerListener implements TriggerListener {
 
     @Override

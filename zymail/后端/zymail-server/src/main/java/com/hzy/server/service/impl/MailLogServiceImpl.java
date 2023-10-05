@@ -2,12 +2,16 @@ package com.hzy.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hzy.server.constant.LogConstant;
 import com.hzy.server.mapper.MailLogMapper;
+import com.hzy.server.model.dto.MailPage;
 import com.hzy.server.model.entity.MailLog;
+import com.hzy.server.model.vo.PageVo;
 import com.hzy.server.service.MailLogService;
 import com.hzy.server.utils.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -59,5 +63,22 @@ public class MailLogServiceImpl extends ServiceImpl<MailLogMapper, MailLog> impl
     @Override
     public void info(String appId, String content) {
         log(appId,content, LogConstant.INFO_LEVEL);
+    }
+
+    @Autowired
+    private MailLogMapper logMapper;
+    @Override
+    public Result getPageLogs(MailPage mailPage, String appId) {
+        Page<MailLog> page = new Page<>(mailPage.getCurrentPage(),(mailPage.getSize()));
+        LambdaQueryWrapper<MailLog> queryWrapper = Wrappers.<MailLog>lambdaQuery();
+        if (appId != null){
+            queryWrapper.eq(MailLog::getSource,appId);
+        }
+        page = logMapper.selectPage(page, queryWrapper);
+        List<MailLog> records = page.getRecords();
+        PageVo pageVo = new PageVo();
+        pageVo.setRows(records);
+        pageVo.setTotal(page.getTotal());
+        return Result.okResult(pageVo);
     }
 }
