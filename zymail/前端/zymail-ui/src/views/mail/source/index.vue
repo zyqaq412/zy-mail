@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div>
-      <el-select v-model="appId" placeholder="请选择">
+    <div id="head">
+      <el-select v-model="appId" placeholder="请选择调度源">
         <el-option
           v-for="id in appIds"
           :key="id"
@@ -18,10 +18,11 @@
       <el-button type="success" plain @click="StartScheduler">开启调度</el-button>
       <el-button type="warning" plain @click="PauseScheduler">暂停调度</el-button>
     </div>
-    <div>
+    <div id="body">
       <el-table
         ref="filterTable"
         :data="jobs"
+        id="table"
         style="width: 100%">
         <el-table-column
           prop="jobName"
@@ -289,3 +290,21 @@ export default {
   }
 }
 </script>
+<style>
+#table {
+  height: 75vh; /* 设置表格的高度为屏幕高度的100% */
+  /* 可以添加其他样式属性，例如滚动条、背景色等 */
+  overflow-y: auto; /* 如果表格内容过多，添加垂直滚动条 */
+}
+#head {
+  background-color: #f0f0f0; /* 设置表头背景颜色 */
+  border-bottom: 1px solid #ddd; /* 添加底部边框 */
+  padding: 10px; /* 添加内边距 */
+}
+
+/* 表体样式 */
+#body {
+  /* 如果需要添加背景色或其他样式，可以在这里添加 */
+  padding: 10px; /* 添加内边距 */
+}
+</style>

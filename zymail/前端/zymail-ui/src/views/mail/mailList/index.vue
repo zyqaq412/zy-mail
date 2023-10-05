@@ -4,6 +4,8 @@
       <el-table
         :data="mailList"
         border
+        :height="tableHeight"
+        :header-fixed="true"
         style="width: 100%">
         <el-table-column
           prop="source"
@@ -153,6 +155,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: 'calc(80vh - 50px)', // 50px 用于容纳分页组件
       formLabelWidth:'120px',
       showDetailDialog: false, // 控制模态框显示状态
       selectedMail: {
@@ -186,11 +189,6 @@ export default {
   /* 可以添加其他样式属性，例如滚动条、背景色等 */
   overflow-y: auto; /* 如果表格内容过多，添加垂直滚动条 */
 }
-/*#mailDetails{
-  height: 100%; !* 设置内容容器高度为100% *!
-  padding: 20px; !* 添加内边距以增加内容的间距 *!
-}*/
-/* 在样式表中定义样式类 */
 .mail-content {
   border: 1px solid #ccc;
   padding: 10px;
@@ -198,7 +196,6 @@ export default {
   overflow: hidden; /* 控制内容溢出时的显示方式 */
   max-height: 1200px; /* 设置最大高度，根据需要调整 */
 }
-
 .mail-content img {
   max-width: 100%; /* 图片最大宽度为父容器的100% */
   height: auto; /* 图片高度自适应，以保持宽高比 */

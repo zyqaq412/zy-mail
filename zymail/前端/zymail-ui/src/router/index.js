@@ -83,7 +83,8 @@ export const constantRoutes = [
         component: () => import('@/views/mail/mailList/template.vue'),
         meta: {
           title: '邮件模板',
-          icon: 'el-icon-s-order'
+          icon: 'el-icon-copy-document'
+
         },
       }
     ]
@@ -107,7 +108,7 @@ export const constantRoutes = [
     component: Layout,
     meta: {
       title: '日志管理',
-      icon: 'el-icon-monitor'
+      icon: 'el-icon-s-order'
     },
     children: [{
       path: '/',
