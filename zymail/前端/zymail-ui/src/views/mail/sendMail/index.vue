@@ -53,7 +53,10 @@
                         :toolbars="toolbars"
                         :fullscreen="fullscreen"
                         @imgAdd="addImg" />-->
-          <mavon-editor id="edit" v-model="form.tempContent" />
+          <mavon-editor id="edit" v-model="form.tempContent" @imgAdd="addImg"
+                        ref="myEditor"
+
+          />
         </el-form-item>
 
         <el-form-item>
@@ -77,7 +80,7 @@
 </template>
 <script>
 import mavonEditor from 'mavon-editor'
-import marked from 'marked';
+import { marked } from 'marked'
 import 'mavon-editor/dist/css/index.css'
 import api from '@/api/mail/sendMail'
 import source from "@/api/source/source";
@@ -202,29 +205,24 @@ export default {
       });
 
     },
-    uploadImg(img) {
-      const formData = new FormData()
-      formData.append('img', img)
-      return axios.post('http://127.0.0.1:36677/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(response => {
-        console.log('上传图片', response.data);
-        return response.data.data
+    // 使用picgo 实现图片生成
+    addImg(pos, file) {
+      return axios.post('http://127.0.0.1:36677/upload').then(response => {
+        const imgUrl = response.data.result[0];
+        const markdownImage = `![图片描述]( ${imgUrl} )`;
+        // 获取编辑器的内容
+        let editorContent = this.form.tempContent;
+        // let url = '/!\\[image\\.png\\]\\(' + pos + '\\)/'
+        let url = '![image.png]('+pos+')'
+        // 替换默认生成的文本
+        editorContent = editorContent.replace(url, markdownImage);
+
+        // 更新编辑器的内容
+        this.form.tempContent = editorContent;
+        return imgUrl
+
       }).catch(error => {
         throw new Error(error.message)
-      })
-    },
-    // 绑定@imgAdd event
-    addImg(pos, file) {
-      console.log("pos",pos)
-      // 第一步.将图片上传到服务器.
-      this.uploadImg(file).then(response => {
-        // TODO 图片能成功上传，但是这里转成url有问题
-        this.$refs.myEditor.$img2Url(pos, response)
-      }).catch(error => {
-        this.$message.error(error.msg)
       })
     },
   }
