@@ -1,5 +1,5 @@
-import source from "@/api/source/source";
-import job from "@/api/job/job";
+import source from "@/api/source/sourceApi";
+import job from "@/api/job/jobApi";
 
 export default {
   data() {

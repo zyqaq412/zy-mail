@@ -25,60 +25,6 @@
     </el-row>
   </div>
 </template>
-<script>
-import api from '@/api/mail/mail'
-import VueClipboard from 'vue-clipboard2';
-import { marked } from 'marked';
-export default {
-  mounted() {
-    this.getTemplates();
-    VueClipboard.config.autoSetContainer = true;
-  },
-  data() {
-    return {
-      templateList:[]
-    }
-  },
 
-  methods:{
-    getHtml(content){
-      return marked(content);
-    },
-    getTemplates() {
-      api.getTemplates().then(res=>{
-          this.templateList = res.data;
-      })
-    },
-    copySuccess() {
-      this.$message({
-        message: '复制成功，快去发送邮件吧',
-        type: 'success'
-      })
-    }
-  }
-}
-
-</script>
-
-<style>
-.text {
-  font-size: 14px;
-}
-
-.item {
-  margin-bottom: 18px;
-}
-
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-}
-.clearfix:after {
-  clear: both
-}
-
-.box-card {
-  width: 480px;
-}
-</style>
+<script src="./template.js" />
+<link rel="stylesheet" type="text/css" href="./template.css">

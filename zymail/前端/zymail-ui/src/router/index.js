@@ -64,7 +64,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'sendMail',
-        component: () => import('@/views/mail/sendMail/index.vue'),
+        component: () => import('@/views/mail/sendMail/sendMail.vue'),
         meta: {
           title: '发送邮件',
           icon: 'el-icon-s-promotion'
@@ -72,7 +72,7 @@ export const constantRoutes = [
       },
       {
         path: 'mailList',
-        component: () => import('@/views/mail/mailList/index.vue'),
+        component: () => import('@/views/mail/mailList/mailList.vue'),
         meta: {
           title: '历史邮件',
           icon: 'el-icon-s-marketing'
@@ -80,7 +80,7 @@ export const constantRoutes = [
       },
       {
         path: 'mailTemplate',
-        component: () => import('@/views/mail/mailList/template.vue'),
+        component: () => import('@/views/mail/mailList/template/template.vue'),
         meta: {
           title: '邮件模板',
           icon: 'el-icon-copy-document'
@@ -113,7 +113,7 @@ export const constantRoutes = [
     children: [{
       path: '/',
       name: '/',
-      component: () => import('@/views/mail/log/index.vue'),
+      component: () => import('@/views/mail/log/log.vue'),
       hidden: true
     }]
   },

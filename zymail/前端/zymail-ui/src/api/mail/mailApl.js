@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+
 const api_name = '/mails'
 export default {
 
@@ -22,10 +23,17 @@ export default {
       data: mail
     })
   },
-  getTemplates(){
+  getTemplates() {
     return request({
       url: `${api_name}/`,
       method: 'get',
     })
-  }
+  },
+  sendMail(mail) {
+    return request({
+      url: `${api_name}`,
+      method: 'post',
+      data: mail
+    })
+  },
 }
