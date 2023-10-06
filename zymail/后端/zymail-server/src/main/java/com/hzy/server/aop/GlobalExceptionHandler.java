@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SystemException.class)
     public Result businessExceptionHandler(SystemException ex) {
+        ex.printStackTrace();
         log.error("业务异常 -- 错误码：" + ex.getCode() + " 错误信息：" + ex.getMessage());
         return Result.errorResult(ex.getCode(), ex.getMessage());
     }

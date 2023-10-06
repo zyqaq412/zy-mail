@@ -67,5 +67,14 @@ public class LogTemplate {
                         "</div>",
                 jobName, jobGroupName, jobClass.getSimpleName());
     }
+    public static String modifyJobTemplate(String jobName, String jobGroupName, String param) {
+        return String.format("<div>" +
+                        "<p>工作名：%s</p>" +
+                        "<p>工作组：%s</p>" +
+                        "<p style=\"color: yellow\">修改！</p>" +
+                        "<p>修改内容：%s</p>" +
+                        "</div>",
+                jobName, jobGroupName, param);
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.hzy.server.controller;
 
+import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.service.JobService;
 import com.hzy.server.service.QuartzService;
 import com.hzy.server.utils.Result;
@@ -66,5 +67,13 @@ public class JobController {
     public Result pauseScheduler() {
         quartzService.pauseScheduler();
         return Result.okResult();
+    }
+
+    @PutMapping("/modify/{radio}")
+
+    public Result modifyJob(@PathVariable Integer radio, @RequestBody JobDto job){
+
+        return quartzService.modifyJob(radio,job);
+
     }
 }

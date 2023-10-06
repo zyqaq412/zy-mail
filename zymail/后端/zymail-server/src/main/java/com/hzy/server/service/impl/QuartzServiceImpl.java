@@ -3,15 +3,18 @@ package com.hzy.server.service.impl;
 import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.constant.AppHttpCodeEnum;
 import com.hzy.server.exception.SystemException;
+import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.MailLogService;
 import com.hzy.server.service.QuartzService;
 import com.hzy.server.utils.LogTemplate;
+import com.hzy.server.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -164,4 +167,117 @@ public class QuartzServiceImpl implements QuartzService {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }
     }
+
+    // region 任务修改
+
+    @Override
+    public Result modifyJob(Integer radio, JobDto job) {
+        try {
+            if (radio == 1){
+                Date startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(job.getStartTime());
+                return   modifyStartTime(job.getJobName(), job.getJobGroupName(),startTime);
+            }else if (radio == 2){
+                Date endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(job.getEndTime());
+                return   modifyEndTime(job.getJobName(), job.getJobGroupName(), endTime);
+            }else if (radio == 3){
+                return   modifyCron(job.getJobName(), job.getJobGroupName(), job.getCron());
+            }
+        }catch (Exception e){
+            throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
+        }
+        return Result.errorResult(AppHttpCodeEnum.JOB_MODIFY_PARAM_ERROR);
+    }
+    private Result modifyStartTime(String jobName, String jobGroupName, Date newStartTime) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey( jobName, jobGroupName);
+            CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return Result.errorResult(AppHttpCodeEnum.JOB_MODIFY_ERROR);
+            }
+            // 获取旧触发器的结束时间
+            Date oldTime = trigger.getStartTime();
+            if (oldTime.compareTo(newStartTime) != 0) {
+                // 触发器
+                TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+                // 触发器名,触发器组
+                triggerBuilder.withIdentity(jobName, jobGroupName);
+                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(trigger.getCronExpression()));
+                triggerBuilder.startAt(newStartTime);
+                triggerBuilder.endAt(trigger.getEndTime());
+                // 创建Trigger对象
+                trigger = (CronTrigger) triggerBuilder.build();
+                // 修改一个任务的触发时间
+                scheduler.rescheduleJob(triggerKey, trigger);
+                logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改开始时间为: "+oldTime+" -> "+newStartTime));
+            }
+        } catch (Exception e) {
+            // 处理异常
+            throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
+        }
+        return Result.okResult();
+    }
+    private Result modifyEndTime(String jobName, String jobGroupName, Date newEndTime) {
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey( jobName, jobGroupName);
+            CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return Result.errorResult(AppHttpCodeEnum.JOB_MODIFY_ERROR);
+            }
+            // 获取旧触发器的结束时间
+            Date oldTime = trigger.getEndTime();
+            if (oldTime.compareTo(newEndTime) != 0) {
+                // 触发器
+                TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+                // 触发器名,触发器组
+                triggerBuilder.withIdentity(jobName, jobGroupName);
+                // 触发器时间设定
+                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(trigger.getCronExpression()));
+                triggerBuilder.startAt(trigger.getStartTime());
+                triggerBuilder.endAt(newEndTime);
+                // 创建Trigger对象
+                trigger = (CronTrigger) triggerBuilder.build();
+                // 修改一个任务的触发时间
+                scheduler.rescheduleJob(triggerKey, trigger);
+                logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改结束时间为: "+oldTime+" -> "+ newEndTime));
+            }
+        } catch (Exception e) {
+            // 处理异常
+            throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
+        }
+        return Result.okResult();
+    }
+    private Result modifyCron( String jobName, String jobGroupName, String param){
+        try {
+            TriggerKey triggerKey = TriggerKey.triggerKey( jobName, jobGroupName);
+            CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+            if (trigger == null) {
+                return Result.errorResult(AppHttpCodeEnum.JOB_MODIFY_ERROR);
+            }
+            String oldTime = trigger.getCronExpression();
+            if (!oldTime.equalsIgnoreCase(param)) {
+                // 触发器
+                TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+                // 触发器名,触发器组
+                triggerBuilder.withIdentity(jobName, jobGroupName);
+
+                // 触发器时间设定
+                triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(param));
+                triggerBuilder.startAt(trigger.getStartTime());
+                triggerBuilder.endAt(trigger.getEndTime());
+                // 创建Trigger对象
+                trigger = (CronTrigger) triggerBuilder.build();
+                // 修改一个任务的触发时间
+                scheduler.rescheduleJob(triggerKey, trigger);
+                logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改定时规则为: "+oldTime+" -> "+ param));
+            }
+        } catch (Exception e) {
+            // 处理异常
+            throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
+        }
+        return Result.okResult();
+    }
+    // endregion
 }

@@ -1,6 +1,8 @@
 package com.hzy.server.service;
 
+import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.model.entity.Mail;
+import com.hzy.server.utils.Result;
 
 import java.util.Date;
 import java.util.Map;
@@ -65,4 +67,12 @@ public interface QuartzService {
      *  暂停调度器
      */
     void pauseScheduler();
+
+    /**
+     *  修改job参数
+     * @param radio
+     * @param job
+     * @return
+     */
+    Result modifyJob(Integer radio, JobDto job);
 }
