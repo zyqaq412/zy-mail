@@ -165,7 +165,7 @@ export default {
         if (valid) {
           // 将markdown格式转为html
           this.form.content = marked(this.form.tempContent);
-          this.template.content = this.form.content;
+          this.template.content = this.form.tempContent;
           this.template.source = this.form.source;
           this.dialogVisible = true;
           // 表单验证通过，执行发送邮件的逻辑

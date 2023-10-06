@@ -10,7 +10,7 @@
                        v-clipboard:success="copySuccess">复制
             </el-button>
           </div>
-          <div v-html="mailTemplate.content"></div>
+          <div v-html="getHtml(mailTemplate.content)"></div>
           <div style="margin-top: 50px; border-top: 1px solid #ddd; font-size: 13px">
             <div style="margin-top: 10px">调度源：
               <router-link :to="`/app-monitor?appId=${mailTemplate.source}`"
@@ -28,6 +28,7 @@
 <script>
 import api from '@/api/mail/mail'
 import VueClipboard from 'vue-clipboard2';
+import { marked } from 'marked';
 export default {
   mounted() {
     this.getTemplates();
@@ -40,6 +41,9 @@ export default {
   },
 
   methods:{
+    getHtml(content){
+      return marked(content);
+    },
     getTemplates() {
       api.getTemplates().then(res=>{
           this.templateList = res.data;
