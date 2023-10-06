@@ -23,6 +23,9 @@ public class LogTemplate {
     public static String startJobTemplate(String jobName, String jobGroupName, Class jobClass, String cron, Date startTime, Date endTime) {
         startTime = Optional.ofNullable(startTime).orElse(new Date());
         String endTimeStr = endTime == null ? "持续" : String.valueOf(endTime);
+        if (cron == null || "".equals(cron)){
+            cron = "仅一次";
+        }
         return String.format("<div>" +
                         "<p>工作名：%s</p>" +
                         "<p>工作组：%s</p>" +

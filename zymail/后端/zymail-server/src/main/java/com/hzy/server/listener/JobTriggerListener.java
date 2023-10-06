@@ -8,7 +8,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.Trigger;
 import org.quartz.TriggerListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
@@ -18,7 +17,6 @@ import java.util.Date;
  * @Date: 2023/10/5 22:36
  * @Version 1.0
  */
-@Component
 public class JobTriggerListener implements TriggerListener {
 
     @Override
@@ -62,8 +60,11 @@ public class JobTriggerListener implements TriggerListener {
     // 方法用于处理触发器完成作业执行时的情况。这个方法会在作业执行完成后被调用
     public void triggerComplete(Trigger trigger, JobExecutionContext jobExecutionContext, Trigger.CompletedExecutionInstruction completedExecutionInstruction) {
         JobDetail jobDetail = jobExecutionContext.getJobDetail();
+        System.out.println("triggerComplete");
+        System.out.println("triggerComplete");
+        System.out.println("triggerComplete");
         // 调度完成时记录日志
-        if (trigger.getEndTime() != null && new Date().compareTo(trigger.getEndTime()) >= 0) {
+        if (trigger.getEndTime() == null || new Date().compareTo(trigger.getEndTime()) >= 0) {
             logService.info(configProperties.getAppId(),
                     LogTemplate.endJobTemplate(jobDetail.getKey().getName(),
                             jobDetail.getKey().getGroup(),
