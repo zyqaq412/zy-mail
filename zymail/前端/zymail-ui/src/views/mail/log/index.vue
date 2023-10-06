@@ -142,7 +142,7 @@ export default {
       return this.statusMap[state] || '未知状态';
     },
     filterState(value, row) {
-      return row.state === value;
+      return row.level === value;
     },
   }
 }

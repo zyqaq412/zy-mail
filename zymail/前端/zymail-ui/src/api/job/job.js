@@ -57,5 +57,12 @@ export default {
       url: '/jobs/scheduler/start',
       method: 'put'
     })
-  }
+  },
+  modifyJob(radio,job) {
+    return request({
+      url: `/jobs/modify/${radio}`,
+      method: 'put',
+      data: job
+    })
+  },
 }
