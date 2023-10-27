@@ -1,5 +1,6 @@
 package com.hzy.server.controller;
 
+import com.hzy.server.annotion.SystemLog;
 import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.service.JobService;
 import com.hzy.server.service.QuartzService;
@@ -34,12 +35,14 @@ public class JobController {
         return jobService.getJobsByAppId(appId);
     }
     // 恢复任务
+    @SystemLog("恢复任务")
     @PutMapping("/resume/{jobName}/{jobGroupName}")
     public Result resumeJob(@PathVariable String jobName, @PathVariable String jobGroupName) {
         quartzService.resumeJob(jobName, jobGroupName);
         return Result.okResult();
     }
     // 暂停任务
+    @SystemLog("暂停任务")
     @PutMapping("/pause/{jobName}/{jobGroupName}")
     public Result pauseJob(@PathVariable String jobName, @PathVariable String jobGroupName) {
         quartzService.pauseJob(jobName, jobGroupName);

@@ -21,6 +21,7 @@ public class ServerInitListener implements ApplicationListener<ContextRefreshedE
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        log.info("服务器启动初始化，检查缓存中的调度源存活状态");
         sourceService.sourcesConnectionCheck();
     }
 

@@ -53,7 +53,7 @@ public class SourceServiceImpl implements SourceService {
     }
     @Override
     public void sourcesConnectionCheck(){
-        log.info("服务器启动初始化，检查缓存中的调度源存活状态");
+
         Collection<String> sources = redisCache.getHashHkeys(SystemConstant.SOURCES_KEY);
         for (String appId : sources){
             try {
