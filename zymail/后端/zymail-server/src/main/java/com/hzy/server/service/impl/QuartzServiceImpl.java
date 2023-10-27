@@ -2,6 +2,7 @@ package com.hzy.server.service.impl;
 
 import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.constant.AppHttpCodeEnum;
+import com.hzy.server.constant.SystemConstant;
 import com.hzy.server.exception.SystemException;
 import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.model.entity.JobVo;
@@ -100,7 +101,7 @@ public class QuartzServiceImpl implements QuartzService {
         jobVO.setEndTime(trigger.getEndTime());
         jobVO.setMail(mail);
         jobVO.setIpaddr(IpUtils.getIpaddr()+":"+port);
-        redisCache.setCacheMapValue("jobVos",jobName,jobVO);
+        redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS,jobName,jobVO);
     }
 
     @Override
@@ -121,29 +122,18 @@ public class QuartzServiceImpl implements QuartzService {
             throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
         }
     }
-    @Autowired
-    private HttpClientUtils httpClientUtils;
+
     @Override
     public void pauseJob(String jobName, String jobGroupName) {
-        // 判断任务是否是当前实列创建的
-        JobVo jobVo = redisCache.getCacheMapValue("jobVos", jobName);
-        String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
-        if (!jobVo.getIpaddr().equals(thisIpaddr)){
-            String url = "http://" + jobVo.getIpaddr() + "/jobs/pause/"+jobName+"/"+jobGroupName;
-            try {
-                httpClientUtils.put(url,"");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            return;
-        }
+
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
         // 停止触发器
         try {
             scheduler.pauseTrigger(triggerKey);
             jobVo.setState(scheduler.getTriggerState(triggerKey).ordinal());
-            redisCache.setCacheMapValue("jobVos", jobName,jobVo);
+            redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
             // 日志管理  添加暂停日志
             logService.warning(configProperties.getAppId(),LogTemplate.pauseJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {
@@ -153,25 +143,15 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     public void resumeJob(String jobName, String jobGroupName) {
-        // 判断任务是否是当前实列创建的
-        JobVo jobVo = redisCache.getCacheMapValue("jobVos", jobName);
-        String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
-        if (!jobVo.getIpaddr().equals(thisIpaddr)){
-            String url = "http://" + jobVo.getIpaddr() + "/jobs/resume/"+jobName+"/"+jobGroupName;
-            try {
-                httpClientUtils.put(url,"");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            return;
-        }
+
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
         // 恢复触发器
         try {
             scheduler.resumeTrigger(triggerKey);
             jobVo.setState(scheduler.getTriggerState(triggerKey).ordinal());
-            redisCache.setCacheMapValue("jobVos", jobName,jobVo);
+            redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
             // 日志管理  添加恢复日志
             logService.info(configProperties.getAppId(),LogTemplate.resumeJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {

@@ -13,4 +13,6 @@ public interface SystemConstant {
     String JOB_SENDMAIL = "sendMail-";
     String MAIL_KEY = "mails:mailId-";
     Integer CACHE_EXPIRE_TIME = 1000 * 60 * 30;
+
+    String CACHE_JOBS = "jobVos";
 }

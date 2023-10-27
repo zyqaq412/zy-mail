@@ -1,7 +1,10 @@
 package com.hzy.server.config;
 
+import com.hzy.server.filter.JobsInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -26,5 +29,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 // 跨域允许时间
                 .maxAge(3600);
+    }
+    @Autowired
+    private JobsInterceptor jobsInterceptor;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+
+        registry.addInterceptor(jobsInterceptor)
+                .addPathPatterns("/jobs/pause/**") // 指定要拦截的路径
+                .addPathPatterns("/jobs/resume/**"); // 指定要拦截的路径
     }
 }
