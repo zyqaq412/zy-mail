@@ -4,14 +4,17 @@ import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.constant.AppHttpCodeEnum;
 import com.hzy.server.exception.SystemException;
 import com.hzy.server.model.dto.JobDto;
+import com.hzy.server.model.entity.JobVo;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.MailLogService;
 import com.hzy.server.service.QuartzService;
 import com.hzy.server.utils.LogTemplate;
+import com.hzy.server.utils.RedisCache;
 import com.hzy.server.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -77,11 +80,29 @@ public class QuartzServiceImpl implements QuartzService {
                 logService.info(configProperties.getAppId(), LogTemplate.startJobTemplate(
                         jobName,jobGroupName,jobClass,cron,startTime,endTime
                 ));
+                cacheJob(trigger,params.get("mail"),jobName,jobGroupName,scheduler.getTriggerState(trigger.getKey()).ordinal());
             }catch (Exception e){
                 e.printStackTrace();
                 throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
             }
 
+    }
+    @Value("${server.port}")
+    private int port;
+    @Autowired
+    private RedisCache redisCache;
+    private void cacheJob(Trigger trigger,Mail mail,String jobName,String jobGroupName,Integer state){
+        JobVo jobVO = new JobVo();
+        jobVO.setJobName(jobName);
+        jobVO.setJobGroupName(jobGroupName);
+        jobVO.setState(state);
+        jobVO.setNextFireTime(trigger.getNextFireTime());
+        jobVO.setPreviousFireTime(trigger.getPreviousFireTime());
+        jobVO.setStartTime(trigger.getStartTime());
+        jobVO.setEndTime(trigger.getEndTime());
+        jobVO.setMail(mail);
+        jobVO.setPort(port);
+        redisCache.setCacheMapValue("jobVos",jobName,jobVO);
     }
 
     @Override

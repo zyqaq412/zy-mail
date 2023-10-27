@@ -1,17 +1,16 @@
 package com.hzy.server.service.impl;
 
 import com.hzy.server.model.entity.JobVo;
-import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.JobService;
+import com.hzy.server.utils.RedisCache;
 import com.hzy.server.utils.Result;
-import org.quartz.*;
-import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * @title: JobServerImpl
@@ -24,12 +23,13 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private Scheduler scheduler;
 
-
+    @Autowired
+    private RedisCache redisCache;
 
     @Override
     public Result getAllJobs() {
-        GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.anyTriggerGroup();
-        return getJobsByGroupMatcher(groupMatcher);
+        // GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.anyTriggerGroup();
+        return getJobsByGroupMatcher(null);
         // 这样获取的效率不高 推荐使用GroupMatcher
         /*
         *
@@ -59,11 +59,28 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Result getJobsByAppId(String appId) {
-        GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.triggerGroupEquals(appId);
-        return getJobsByGroupMatcher(groupMatcher);
+        // GroupMatcher<TriggerKey> groupMatcher = GroupMatcher.triggerGroupEquals(appId);
+        return getJobsByGroupMatcher(appId);
     }
 
-    private Result getJobsByGroupMatcher(GroupMatcher<TriggerKey> groupMatcher) {
+    private Result getJobsByGroupMatcher(String appId) {
+        Map<String, Object> hashAll = redisCache.getHashAll("jobVos");
+        List<JobVo> jobVOS = new ArrayList<>();
+        if (appId == null){
+            for (Map.Entry<String, Object> entry : hashAll.entrySet()){
+                jobVOS.add((JobVo) entry.getValue());
+            }
+        }else {
+            for (Map.Entry<String, Object> entry : hashAll.entrySet()){
+               JobVo jobVo = (JobVo) entry.getValue();
+               if (jobVo.getJobGroupName().equals(appId)){
+                   jobVOS.add(jobVo);
+               }
+            }
+        }
+        return Result.okResult(jobVOS);
+    }
+/*    private Result getJobsByGroupMatcher(GroupMatcher<TriggerKey> groupMatcher) {
         List<JobVo> jobVOS = new ArrayList<>();
         try {
             Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(groupMatcher);
@@ -86,5 +103,5 @@ public class JobServiceImpl implements JobService {
             return Result.okResult(jobVOS);
         }
         return Result.okResult(jobVOS);
-    }
+    }*/
 }

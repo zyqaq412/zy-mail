@@ -55,6 +55,12 @@ public class JobVo implements Serializable {
      */
     private Date nextFireTime;
 
+    /**
+     *  实列 端口号
+     * */
+    private int port;
+
 
     private static final long serialVersionUID = -654956488863895435L;
+
 }
