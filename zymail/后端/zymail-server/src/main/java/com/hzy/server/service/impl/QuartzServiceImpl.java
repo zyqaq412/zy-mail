@@ -82,7 +82,8 @@ public class QuartzServiceImpl implements QuartzService {
                 logService.info(configProperties.getAppId(), LogTemplate.startJobTemplate(
                         jobName,jobGroupName,jobClass,cron,startTime,endTime
                 ));
-                cacheJob(trigger,params.get("mail"),jobName,jobGroupName,scheduler.getTriggerState(trigger.getKey()).ordinal());
+                cacheJob(trigger,params.get("mail"),jobName,jobGroupName,
+                        scheduler.getTriggerState(trigger.getKey()).ordinal(),cron);
             }catch (Exception e){
                 e.printStackTrace();
                 throw new SystemException(AppHttpCodeEnum.QUARTZ_ERROR);
@@ -91,7 +92,8 @@ public class QuartzServiceImpl implements QuartzService {
     }
     @Autowired
     private RedisCache redisCache;
-    private void cacheJob(Trigger trigger,Mail mail,String jobName,String jobGroupName,Integer state){
+    private void cacheJob(Trigger trigger,Mail mail,String jobName,String jobGroupName,Integer state,
+                           String cron){
         JobVo jobVO = new JobVo();
         jobVO.setJobName(jobName);
         jobVO.setJobGroupName(jobGroupName);
@@ -102,6 +104,7 @@ public class QuartzServiceImpl implements QuartzService {
         jobVO.setEndTime(trigger.getEndTime());
         jobVO.setMail(mail);
         jobVO.setIpaddr(IpUtils.getIpaddr()+":"+port);
+        jobVO.setCron(cron);
         redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS,jobName,jobVO);
     }
 

@@ -15,7 +15,8 @@ public enum AppHttpCodeEnum {
     CLIENT_HEART_CHECK_FAILED(0, "客户端心跳检测失败"),
     CLIENT_HEART_CHECK_SUCCESS(1,"客户端心跳检测成功"),
     JOB_MODIFY_PARAM_ERROR(410,"任务修改参数类别未知"),
-    JOB_MODIFY_ERROR(511,"任务修改失败");
+    JOB_MODIFY_ERROR(511,"任务修改失败"),
+    JOB_HEAVYLOAD_ERROR(512,"任务重载失败");
 
 
 

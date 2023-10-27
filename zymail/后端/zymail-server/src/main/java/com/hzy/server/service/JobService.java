@@ -20,4 +20,9 @@ public interface JobService {
      * @return
      */
     Result getJobsByAppId(String appId);
+
+    /**
+     *  项目重启时 加载之前未完成任务
+     */
+    void JobHeavyLoad();
 }

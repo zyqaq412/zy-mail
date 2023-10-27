@@ -19,7 +19,6 @@ public class JobVo implements Serializable {
     private Mail mail;
 
 
-
     /**
      * 状态
      */
@@ -58,12 +57,19 @@ public class JobVo implements Serializable {
     /*
      *  实列 端口号
      * */
-/*    private int port;*/
+    /*    private int port;*/
     /**
-     *  创建任务的实列ip地址
-     * */
+     * 创建任务的实列ip地址
+     */
     private String ipaddr;
-
+    /**
+     * 工作类
+     */
+    // private Class jobClass;
+    /**
+     * 定时表达式
+     */
+    private String cron;
 
     private static final long serialVersionUID = -654956488863895435L;
 

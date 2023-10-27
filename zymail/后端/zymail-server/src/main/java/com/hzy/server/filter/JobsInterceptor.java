@@ -39,16 +39,17 @@ public class JobsInterceptor implements HandlerInterceptor {
         // 在日志中打印请求路径
         // System.out.println("请求路径: " + requestURI);
         // 请求路径: /jobs/pause/sendMail-df08d3b7-ad64-4044-9da2-2ed4337111d9/zymail-server
-        System.out.println("拦截器");
+
         // 获取HTTP请求方法
         String method = request.getMethod();
+        System.out.println("拦截器_拦截路径：" + requestURI + "\t 请求方法：" + method);
         if (method.equals("GET")) return true;
 
         String[] split = requestURI.split("/");
         String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
 
         String path = split[2];
-        if (path.equals("modify")){
+        if (path.equals("modify")) {
 
             return true;
         }
@@ -62,7 +63,7 @@ public class JobsInterceptor implements HandlerInterceptor {
             String forwardUrl = "http://" + jobVo.getIpaddr() + requestURI;
             if (method.equals("PUT")) {
                 httpClientUtils.put(forwardUrl, "");
-            }else if (method.equals("DELETE")){
+            } else if (method.equals("DELETE")) {
                 httpClientUtils.delete(forwardUrl);
             }
             // 返回false表示请求已经被转发，不需要继续处理

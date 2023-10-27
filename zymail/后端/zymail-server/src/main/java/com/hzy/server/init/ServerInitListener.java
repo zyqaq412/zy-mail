@@ -1,5 +1,6 @@
 package com.hzy.server.init;
 
+import com.hzy.server.service.JobService;
 import com.hzy.server.service.SourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,15 @@ import org.springframework.stereotype.Component;
 public class ServerInitListener implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private SourceService sourceService;
+    @Autowired
+    private JobService jobService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("服务器启动初始化，检查缓存中的调度源存活状态");
         sourceService.sourcesConnectionCheck();
+        log.info("服务器启动初始化，重载任务");
+        jobService.JobHeavyLoad();
     }
 
 
