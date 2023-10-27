@@ -4,6 +4,7 @@ import com.hzy.server.annotion.SystemLog;
 import com.hzy.server.model.dto.JobDto;
 import com.hzy.server.service.JobService;
 import com.hzy.server.service.QuartzService;
+import com.hzy.server.utils.RedisCache;
 import com.hzy.server.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -72,10 +73,11 @@ public class JobController {
         return Result.okResult();
     }
 
+    @Autowired
+    private RedisCache redisCache;
     @PutMapping("/modify/{radio}")
 
     public Result modifyJob(@PathVariable Integer radio, @RequestBody JobDto job){
-
         return quartzService.modifyJob(radio,job);
 
     }

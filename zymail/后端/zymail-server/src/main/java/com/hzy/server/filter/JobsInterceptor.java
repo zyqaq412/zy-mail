@@ -29,6 +29,7 @@ public class JobsInterceptor implements HandlerInterceptor {
     private int port;
     @Autowired
     private HttpClientUtils httpClientUtils;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 在请求到达Controller之前执行
@@ -39,16 +40,31 @@ public class JobsInterceptor implements HandlerInterceptor {
         // System.out.println("请求路径: " + requestURI);
         // 请求路径: /jobs/pause/sendMail-df08d3b7-ad64-4044-9da2-2ed4337111d9/zymail-server
         System.out.println("拦截器");
+        // 获取HTTP请求方法
+        String method = request.getMethod();
+        if (method.equals("GET")) return true;
 
         String[] split = requestURI.split("/");
-        String jobName = split[split.length-2];
-        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
         String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
-        if (!jobVo.getIpaddr().equals(thisIpaddr)){
-            System.out.println("转发请求");
+
+        String path = split[2];
+        if (path.equals("modify")){
+
+            return true;
+        }
+
+        String jobName = split[split.length - 2];
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
+
+        if (!jobVo.getIpaddr().equals(thisIpaddr)) {
             // 如果条件满足，将请求转发到jobVo.getIpaddr()
+            System.out.println("转发请求");
             String forwardUrl = "http://" + jobVo.getIpaddr() + requestURI;
-            httpClientUtils.put(forwardUrl,"");
+            if (method.equals("PUT")) {
+                httpClientUtils.put(forwardUrl, "");
+            }else if (method.equals("DELETE")){
+                httpClientUtils.delete(forwardUrl);
+            }
             // 返回false表示请求已经被转发，不需要继续处理
             return false;
         }

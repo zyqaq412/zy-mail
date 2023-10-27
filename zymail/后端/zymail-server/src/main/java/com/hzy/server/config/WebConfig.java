@@ -36,7 +36,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 
         registry.addInterceptor(jobsInterceptor)
-                .addPathPatterns("/jobs/pause/**") // 指定要拦截的路径
-                .addPathPatterns("/jobs/resume/**"); // 指定要拦截的路径
+                .addPathPatterns("/jobs/**") ;// 指定要拦截的路径
     }
 }

@@ -1,5 +1,6 @@
 package com.hzy.server.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hzy.server.config.ConfigProperties;
 import com.hzy.server.constant.AppHttpCodeEnum;
 import com.hzy.server.constant.SystemConstant;
@@ -107,7 +108,6 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     public void removeJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName) {
         try {
-
             TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, triggerGroupName);
             // 停止触发器
             scheduler.pauseTrigger(triggerKey);
@@ -115,6 +115,9 @@ public class QuartzServiceImpl implements QuartzService {
             scheduler.unscheduleJob(triggerKey);
             // 删除任务
             scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
+
+            redisCache.delCacheMapValue(SystemConstant.CACHE_JOBS,jobName);
+
             log.info("删除任务:"+JobKey.jobKey(jobName));
             // 日志管理  添加删除日志
             logService.error(configProperties.getAppId(),LogTemplate.delJobTemplate(jobName,jobGroupName));
@@ -200,8 +203,35 @@ public class QuartzServiceImpl implements QuartzService {
 
     // region 任务修改
 
+    private void modifyCache(Trigger trigger,String jobName,Integer state){
+        // 更新缓存
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
+        jobVo.setStartTime(trigger.getStartTime());
+        jobVo.setEndTime(trigger.getEndTime());
+        jobVo.setNextFireTime(trigger.getNextFireTime());
+        jobVo.setPreviousFireTime(trigger.getPreviousFireTime());
+
+        redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
+
+    }
+
+    @Autowired
+    private HttpClientUtils httpClientUtils;
     @Override
     public Result modifyJob(Integer radio, JobDto job) {
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, job.getJobName());
+        String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
+        if (!jobVo.getIpaddr().equals(thisIpaddr)) {
+            System.out.println("转发");
+            String forwardUrl = "http://" + jobVo.getIpaddr() + "/modify/"+radio;
+            try {
+                httpClientUtils.put(forwardUrl, JSONObject.toJSONString(job));
+                return Result.okResult();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         try {
             if (radio == 1){
                 Date startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(job.getStartTime());
@@ -241,6 +271,8 @@ public class QuartzServiceImpl implements QuartzService {
                 logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改开始时间为: "+oldTime+" -> "+newStartTime));
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
@@ -272,6 +304,8 @@ public class QuartzServiceImpl implements QuartzService {
                 logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改结束时间为: "+oldTime+" -> "+ newEndTime));
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
@@ -303,6 +337,8 @@ public class QuartzServiceImpl implements QuartzService {
                 logService.info(configProperties.getAppId(),LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改定时规则为: "+oldTime+" -> "+ param));
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(AppHttpCodeEnum.JOB_MODIFY_ERROR,e.getMessage());
