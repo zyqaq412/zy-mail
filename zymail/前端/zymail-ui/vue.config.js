@@ -40,7 +40,8 @@ module.exports = {
     // TODO 配置请求路径
     proxy: {
       '/dev-api': { // 匹配所有以 '/dev-api'开头的请求路径
-        target: 'http://localhost:8888',
+        // 前端请求到网关
+        target: 'http://localhost:10010',
         changeOrigin: true, // 支持跨域
         pathRewrite: { // 重写路径: 去掉路径中开头的'/dev-api'
           '^/dev-api': ''
