@@ -80,4 +80,15 @@ public class LogTemplate {
                 jobName, jobGroupName, param);
     }
 
+
+    public static String heavyLoadJobTemplate(String jobName, String jobGroupName,String ipaddr) {
+        return String.format("<div>" +
+                        "<p>工作名：%s</p>" +
+                        "<p>工作组：%s</p>" +
+                        "<p>执行ip：%s</p>" +
+                        "<p style=\"color: yellow\">重载！</p>" +
+                        "</div>",
+                jobName, jobGroupName,ipaddr);
+    }
+
 }

@@ -9,10 +9,8 @@ import com.hzy.server.job.RemoteSendMailJob;
 import com.hzy.server.model.entity.JobVo;
 import com.hzy.server.model.entity.Mail;
 import com.hzy.server.service.JobService;
-import com.hzy.server.utils.HttpClientUtils;
-import com.hzy.server.utils.IpUtils;
-import com.hzy.server.utils.RedisCache;
-import com.hzy.server.utils.Result;
+import com.hzy.server.service.MailLogService;
+import com.hzy.server.utils.*;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,6 +92,8 @@ public class JobServiceImpl implements JobService {
     private HttpClientUtils httpClientUtils;
     @Value("${server.port}")
     private int port;
+    @Autowired
+    private MailLogService logService;
 
     @Override
     public void JobHeavyLoad() {
@@ -103,35 +103,40 @@ public class JobServiceImpl implements JobService {
         for (Map.Entry<String, Object> entry : hashAll.entrySet()) {
             JobVo jobVo = (JobVo) entry.getValue();
             Map<String, Mail> params = new HashMap<>();
-            params.put("mail",jobVo.getMail());
+            params.put("mail", jobVo.getMail());
             if (thisIpaddr.equals(jobVo.getIpaddr())) {
-                    loadJob(jobVo.getJobName(), jobVo.getJobGroupName(),jobVo.getJobName(), jobVo.getJobGroupName(),
-                            jobVo.getCron(),jobVo.getStartTime(),jobVo.getEndTime(),params);
+                loadJob(jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getJobName(), jobVo.getJobGroupName(),
+                        jobVo.getCron(), jobVo.getStartTime(), jobVo.getEndTime(), params);
             } else {
                 try {
                     String ans = httpClientUtils.get("http://" + jobVo.getIpaddr() + "/heart");
-                    if (ans.equals("1"))continue;
+                    if (ans.equals("1")) continue;
                 } catch (Exception e) {
-                    loadJob(jobVo.getJobName(), jobVo.getJobGroupName(),jobVo.getJobName(), jobVo.getJobGroupName(),
-                            jobVo.getCron(),jobVo.getStartTime(),jobVo.getEndTime(),params);
-                    jobVo.setIpaddr(IpUtils.getIpaddr()+":"+port);
+                    loadJob(jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getJobName(), jobVo.getJobGroupName(),
+                            jobVo.getCron(), jobVo.getStartTime(), jobVo.getEndTime(), params);
+                    jobVo.setIpaddr(IpUtils.getIpaddr() + ":" + port);
                     redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobVo.getJobName(), jobVo);
                 }
             }
+            logService.warning(configProperties.getAppId(), LogTemplate.heavyLoadJobTemplate(
+                    jobVo.getJobName(), jobVo.getJobGroupName(),jobVo.getIpaddr()
+            ));
         }
 
     }
+
     @Autowired
     private ConfigProperties configProperties;
+
     private void loadJob(String jobName, String jobGroupName, // 工作名 ， 工作组名(调度源)
                          String triggerName, String triggerGroupName, // 触发器名 ， 触发器组名(调度源)
-                          String cron,  // 自定义工作类 ，
+                         String cron,  // 自定义工作类 ，
                          Date startTime, Date endTime,
-                         Map<String, Mail> params){
+                         Map<String, Mail> params) {
         Class jobClass = null;
-        if (jobGroupName.equals(configProperties.getAppId())){
+        if (jobGroupName.equals(configProperties.getAppId())) {
             jobClass = LocalSendMailJob.class;
-        }else {
+        } else {
             jobClass = RemoteSendMailJob.class;
         }
         try {
@@ -146,12 +151,12 @@ public class JobServiceImpl implements JobService {
             TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
             // 触发器名,触发器组
             triggerBuilder.withIdentity(triggerName, triggerGroupName);
-            if (startTime != null){
+            if (startTime != null) {
                 triggerBuilder.startAt(startTime);
-            }else {
+            } else {
                 triggerBuilder.startNow();
             }
-            if (endTime != null){
+            if (endTime != null) {
                 triggerBuilder.endAt(endTime);
             }
             // 触发器时间设定   cron 为空就只执行一次
@@ -167,7 +172,7 @@ public class JobServiceImpl implements JobService {
             // 启动
             scheduler.start();
             scheduler.scheduleJob(jobDetail, trigger);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new SystemException(AppHttpCodeEnum.JOB_HEAVYLOAD_ERROR);
         }
