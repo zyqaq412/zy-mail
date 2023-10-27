@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: zymail-server
+#  profiles:
+#    active: dev #开发环境，这里是dev
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848 # Nacos地址
   # redis
   redis:
     host: 127.0.0.1
