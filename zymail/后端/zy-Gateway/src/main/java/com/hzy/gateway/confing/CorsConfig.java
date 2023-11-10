@@ -16,7 +16,6 @@ import java.util.Collections;
  */
 @Configuration
 public class CorsConfig {
-
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
@@ -30,7 +29,6 @@ public class CorsConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig); // 匹配所有路径
-
         return new CorsWebFilter(source);
     }
 }

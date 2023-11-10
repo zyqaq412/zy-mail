@@ -10,7 +10,8 @@ export default {
         jobName:'',
         startTime:'',
         endTime:'',
-        cron:''
+        cron:'',
+        ipaddr:''
       },
       type:{
         s: true,

@@ -41,7 +41,7 @@ public class LoginController {
         Map<String, Object> map = new HashMap<>();
         map.put("roles","[admin]");
         map.put("name","admin");
-        map.put("avatar","https://oss.aliyuncs.com/aliyun_id_photo_bucket/default_handsome.jpg");
+        map.put("avatar","https://cdn.jsdelivr.net/gh/zxwyhzy/zy-img1/md/202311091226366.png");
         return Result.okResult(map);
     }
     /**

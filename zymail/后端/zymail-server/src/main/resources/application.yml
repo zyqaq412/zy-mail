@@ -9,12 +9,13 @@ spring:
 #    active: dev #开发环境，这里是dev
   cloud:
     nacos:
-      server-addr: 127.0.0.1:8848 # Nacos地址
+      server-addr: 192.168.193.40:8848 # Nacos地址
   # redis
   redis:
-    host: 127.0.0.1
+    host: 192.168.193.40
     port: 6379
     database: 0
+    password: 123456
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     #driver-class-name: com.mysql.cj.jdbc.Driver

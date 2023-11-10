@@ -97,6 +97,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void JobHeavyLoad() {
+        // TODO 这里重载的操作需要加分布式锁 防止多个实列同时重载一个任务
         String thisIpaddr = IpUtils.getIpaddr() + ":" + port;
 
         Map<String, Object> hashAll = redisCache.getHashAll(SystemConstant.CACHE_JOBS);

@@ -9,6 +9,7 @@ import com.hzy.server.service.MailService;
 import com.hzy.server.service.RemoteMailService;
 import com.hzy.server.service.TemplateService;
 import com.hzy.server.utils.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,7 @@ import java.util.Date;
  */
 @RequestMapping("/mails")
 @RestController
+@Slf4j
 public class MailController {
     @Autowired
     private ConfigProperties configProperties;
@@ -54,8 +56,8 @@ public class MailController {
     private MailService mailService;
 
     @PostMapping("/list")
-    public Result mailList(@RequestBody MailPage mailPage) {
-
+    public Result mailList(@RequestBody MailPage mailPage)  {
+        log.info("获取历史邮件-- 测试负载均衡");
         return mailService.getList(mailPage);
     }
 

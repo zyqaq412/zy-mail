@@ -55,6 +55,8 @@ public class JobController {
         quartzService.removeJob(jobName, jobGroupName, jobName, jobGroupName);
         return Result.okResult();
     }
+    // TODO 调度器操作需要每一个实列都执行
+    // 使用 消息队列 发送消息实现
     // 获取调度器状态
     @GetMapping("/scheduler/status")
     public Result getSchedulerStatus() {
