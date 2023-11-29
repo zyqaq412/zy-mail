@@ -27,17 +27,17 @@ public class LogController {
     public Result getPageLogs(@RequestBody MailPage mailPage) {
         return logService.getPageLogs(mailPage,null);
     }
-    @PostMapping()
+    @PostMapping("/error")
     public Result addError(String appId, String content) {
         logService.error(appId,content);
         return Result.okResult();
     }
-    @PostMapping()
+    @PostMapping("/warning")
     public Result addWarning(String appId, String content) {
         logService.warning(appId,content);
         return Result.okResult();
     }
-    @PostMapping()
+    @PostMapping("/info")
     public Result addInfo(String appId, String content) {
         logService.info(appId,content);
         return Result.okResult();
