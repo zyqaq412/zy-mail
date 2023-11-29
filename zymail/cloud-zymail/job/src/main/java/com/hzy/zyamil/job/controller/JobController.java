@@ -3,13 +3,15 @@ package com.hzy.zyamil.job.controller;
 import com.hzy.zyamil.common.model.dto.JobDto;
 import com.hzy.zyamil.common.model.entity.Mail;
 import com.hzy.zyamil.common.utils.Result;
-import com.hzy.zyamil.job.jobs.RemoteSendMailJob;
+import com.hzy.zyamil.job.jobs.SendMailJob;
 import com.hzy.zyamil.job.service.JobService;
 import com.hzy.zyamil.job.service.QuartzService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @title: JobController
@@ -36,7 +38,7 @@ public class JobController {
                 mail.getSource(),
                 "sendMail-" + uniKey,
                 mail.getSource(),
-                RemoteSendMailJob.class,
+                SendMailJob.class,
                 mail.getCron(),
                 mail.getStartTime(),
                 mail.getEndTime(),
