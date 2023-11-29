@@ -4,7 +4,9 @@ import com.hzy.zyamil.common.exception.SystemException;
 import com.hzy.zyamil.common.model.dto.JobDto;
 import com.hzy.zyamil.common.model.entity.Mail;
 import com.hzy.zyamil.common.utils.CodeEnum;
+import com.hzy.zyamil.common.utils.LogTemplate;
 import com.hzy.zyamil.common.utils.Result;
+import com.hzy.zyamil.job.clients.LogClients;
 import com.hzy.zyamil.job.service.QuartzService;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Autowired
     private Scheduler scheduler;
+    @Autowired
+    private LogClients logClients;
     @Override
     public void addJob(String jobName, String jobGroupName, // 工作名 ， 工作组名(调度源)
                        String triggerName, String triggerGroupName, // 触发器名 ， 触发器组名(调度源)
@@ -65,6 +69,10 @@ public class QuartzServiceImpl implements QuartzService {
             // 启动
             scheduler.start();
             scheduler.scheduleJob(jobDetail, trigger);
+            // 日志管理  添加启动日志
+            logClients.info(jobGroupName, LogTemplate.startJobTemplate(
+                    jobName,jobGroupName,jobClass,cron,startTime,endTime
+            ));
         }catch (Exception e){
             e.printStackTrace();
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
@@ -83,7 +91,8 @@ public class QuartzServiceImpl implements QuartzService {
             scheduler.unscheduleJob(triggerKey);
             // 删除任务
             scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
-
+            // 日志管理  添加删除日志
+            logClients.error(jobGroupName,LogTemplate.delJobTemplate(jobName,jobGroupName));
         } catch (Exception e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -97,6 +106,8 @@ public class QuartzServiceImpl implements QuartzService {
         // 停止触发器
         try {
             scheduler.pauseTrigger(triggerKey);
+            // 日志管理  添加暂停日志
+            logClients.warning(jobGroupName,LogTemplate.pauseJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -111,6 +122,8 @@ public class QuartzServiceImpl implements QuartzService {
         // 恢复触发器
         try {
             scheduler.resumeTrigger(triggerKey);
+            // 日志管理  添加恢复日志
+            logClients.info(jobGroupName,LogTemplate.resumeJobTemplate(jobName,jobGroupName));
         } catch (SchedulerException e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -194,6 +207,10 @@ public class QuartzServiceImpl implements QuartzService {
                 trigger = (CronTrigger) triggerBuilder.build();
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
+                // 日志
+                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改开始时间为: "+oldTime+" -> "+newStartTime));
+
             }
         } catch (Exception e) {
             // 处理异常
@@ -223,6 +240,9 @@ public class QuartzServiceImpl implements QuartzService {
                 trigger = (CronTrigger) triggerBuilder.build();
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
+                // 日志
+                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改结束时间为: "+oldTime+" -> "+ newEndTime));
             }
         } catch (Exception e) {
             // 处理异常
@@ -252,6 +272,9 @@ public class QuartzServiceImpl implements QuartzService {
                 trigger = (CronTrigger) triggerBuilder.build();
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
+                // 日志
+                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                        "修改定时规则为: "+oldTime+" -> "+ param));
 
             }
         } catch (Exception e) {
