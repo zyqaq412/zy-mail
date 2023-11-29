@@ -3,6 +3,7 @@ package com.hzy.zyamil.job.clients;
 import com.hzy.zyamil.common.model.entity.Mail;
 import com.hzy.zyamil.common.utils.Result;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,8 +20,8 @@ public interface ZymailClient {
      * @param mail
      * @return
      */
-    @PostMapping("/mails")
+    @PostMapping(value = "/mails/send",consumes = MediaType.APPLICATION_JSON_VALUE)
     Result sendEmail(@RequestBody Mail mail);
-    @PostMapping("/mails/save")
+    @PostMapping(value = "/mails/saveMail",consumes = MediaType.APPLICATION_JSON_VALUE)
     Result save(@RequestBody Mail mail);
 }
