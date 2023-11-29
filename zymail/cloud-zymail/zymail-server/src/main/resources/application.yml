@@ -1,0 +1,42 @@
+server:
+  # 项目端口号
+  port: 8888
+
+spring:
+  application:
+    name: zymail-server
+#  profiles:
+#    active: dev #开发环境，这里是dev
+  cloud:
+    nacos:
+      server-addr: 192.168.193.40:8848 # Nacos地址
+  # redis
+  redis:
+    host: 192.168.193.40
+    port: 6379
+    database: 0
+    password: 123456
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zymail?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 120125hzy.
+  mybatis-plus:
+    # 开启雪花算法生成ID
+    global-config:
+      db-config:
+        # id-type: 1
+    # 将字段名大写切换为下划线
+        column-underline: true
+zymail:
+  app-id: zymail-server
+  # 配置管理员账户
+  admin:
+    username: admin
+    password: admin
+  mail:
+    host: smtp.163.com
+    username: huangzheyu2024@163.com
+    password: ZZIGGUATBITQVDJC
