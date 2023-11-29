@@ -1,0 +1,9 @@
+server:
+  # 项目端口号
+  port: 8881
+spring:
+  application:
+    name: job-server
+  cloud:
+    nacos:
+      server-addr: 192.168.193.40:8848 # Nacos地址
