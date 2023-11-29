@@ -12,7 +12,13 @@ spring:
           uri: lb://job-server # 服务地址
           predicates: # 路由断言，也就是判断请求是否符合路由规则的条件
             - Path=/jobs/** # 这个是按照路径匹配，只要以/jobs开头就符合要求
-            - # /jobs 只匹配 /jobs,/jobs/* 只匹配/jobs和下一级子目录目录，/jobs/a 匹配 /jobs/a/b 不匹配
+            # /jobs 只匹配 /jobs,/jobs/* 只匹配/jobs和下一级子目录目录，/jobs/a 匹配 /jobs/a/b 不匹配
+
+        - id: log-server
+          uri: lb://log-server
+          predicates:
+            - Path=/logs/**
+
         - id: zymail-server
           uri: lb://zymail-server
           predicates:
