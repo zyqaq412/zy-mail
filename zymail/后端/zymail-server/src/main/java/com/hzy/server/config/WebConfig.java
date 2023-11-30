@@ -26,7 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
                 // 设置允许的请求方式
                 .allowedMethods("GET", "POST", "DELETE", "PUT")
                 // 设置允许的header属性
-                .allowedHeaders("*")
+                // .allowedHeaders("*")
+                .allowedHeaders("application/json")
                 // 跨域允许时间
                 .maxAge(3600);
     }
