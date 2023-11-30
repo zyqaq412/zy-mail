@@ -1,4 +1,4 @@
-package com.hzy.zyamil.server.utils;
+package com.hzy.zyamil.common.utils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

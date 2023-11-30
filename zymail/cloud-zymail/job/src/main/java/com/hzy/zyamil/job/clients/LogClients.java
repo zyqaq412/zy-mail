@@ -13,13 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @FeignClient("log-server")
 public interface LogClients {
-
-    @PostMapping("/logs/warning")
-    Result warning(@RequestParam("appId") String appId, @RequestParam("content") String content);
-
-    @PostMapping("/logs/error")
-    Result error(@RequestParam("appId") String appId, @RequestParam("content") String content);
-
-    @PostMapping("/logs/info")
-    Result info(@RequestParam("appId") String appId, @RequestParam("content") String content);
+    @PostMapping("/logs/log")
+    Result log(@RequestParam("appId") String appId, @RequestParam("content") String content,@RequestParam("level")Integer level);
 }

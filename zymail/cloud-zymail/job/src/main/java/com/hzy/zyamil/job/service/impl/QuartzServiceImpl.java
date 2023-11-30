@@ -1,15 +1,21 @@
 package com.hzy.zyamil.job.service.impl;
 
+import com.hzy.zyamil.common.constant.SystemConstant;
 import com.hzy.zyamil.common.exception.SystemException;
 import com.hzy.zyamil.common.model.dto.JobDto;
 import com.hzy.zyamil.common.model.entity.Mail;
+import com.hzy.zyamil.common.model.vo.JobVo;
 import com.hzy.zyamil.common.utils.CodeEnum;
+import com.hzy.zyamil.common.utils.IpUtils;
 import com.hzy.zyamil.common.utils.LogTemplate;
 import com.hzy.zyamil.common.utils.Result;
-import com.hzy.zyamil.job.clients.LogClients;
+import com.hzy.zyamil.job.service.LogService;
 import com.hzy.zyamil.job.service.QuartzService;
+import com.hzy.zyamil.job.utils.RedisCache;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +35,12 @@ public class QuartzServiceImpl implements QuartzService {
     @Autowired
     private Scheduler scheduler;
     @Autowired
-    private LogClients logClients;
+    @Lazy
+    private LogService logService;
+    @Value("${server.port}")
+    private int port;
+    @Autowired
+    private RedisCache redisCache;
     @Override
     public void addJob(String jobName, String jobGroupName, // 工作名 ， 工作组名(调度源)
                        String triggerName, String triggerGroupName, // 触发器名 ， 触发器组名(调度源)
@@ -70,9 +81,12 @@ public class QuartzServiceImpl implements QuartzService {
             scheduler.start();
             scheduler.scheduleJob(jobDetail, trigger);
             // 日志管理  添加启动日志
-            logClients.info(jobGroupName, LogTemplate.startJobTemplate(
+            logService.info(jobGroupName, LogTemplate.startJobTemplate(
                     jobName,jobGroupName,jobClass,cron,startTime,endTime
             ));
+            // 创建任务缓存
+            cacheJob(trigger,params.get("mail"),jobName,jobGroupName,
+                    scheduler.getTriggerState(trigger.getKey()).ordinal(),cron);
         }catch (Exception e){
             e.printStackTrace();
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
@@ -80,6 +94,21 @@ public class QuartzServiceImpl implements QuartzService {
 
     }
 
+    private void cacheJob(Trigger trigger,Mail mail,String jobName,String jobGroupName,Integer state,
+                          String cron){
+        JobVo jobVO = new JobVo();
+        jobVO.setJobName(jobName);
+        jobVO.setJobGroupName(jobGroupName);
+        jobVO.setState(state);
+        jobVO.setNextFireTime(trigger.getNextFireTime());
+        jobVO.setPreviousFireTime(trigger.getPreviousFireTime());
+        jobVO.setStartTime(trigger.getStartTime());
+        jobVO.setEndTime(trigger.getEndTime());
+        jobVO.setMail(mail);
+        jobVO.setIpaddr(IpUtils.getIpaddr()+":"+port);
+        jobVO.setCron(cron);
+        redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS,jobName,jobVO);
+    }
 
     @Override
     public void removeJob(String jobName, String jobGroupName, String triggerName, String triggerGroupName) {
@@ -92,7 +121,11 @@ public class QuartzServiceImpl implements QuartzService {
             // 删除任务
             scheduler.deleteJob(JobKey.jobKey(jobName, jobGroupName));
             // 日志管理  添加删除日志
-            logClients.error(jobGroupName,LogTemplate.delJobTemplate(jobName,jobGroupName));
+            logService.error(jobGroupName,LogTemplate.delJobTemplate(jobName,jobGroupName));
+
+            // 删除任务缓存
+            redisCache.delCacheMapValue(SystemConstant.CACHE_JOBS,jobName);
+
         } catch (Exception e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -100,14 +133,22 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     public void pauseJob(String jobName, String jobGroupName) {
-
+        // 获取缓存
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
         // 停止触发器
         try {
             scheduler.pauseTrigger(triggerKey);
+            // 更新缓存状态
+            jobVo.setState(scheduler.getTriggerState(triggerKey).ordinal());
+            // 更新缓存
+            redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
+
             // 日志管理  添加暂停日志
-            logClients.warning(jobGroupName,LogTemplate.pauseJobTemplate(jobName,jobGroupName));
+            logService.warning(jobGroupName,LogTemplate.pauseJobTemplate(jobName,jobGroupName));
+
+
         } catch (SchedulerException e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -115,15 +156,19 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Override
     public void resumeJob(String jobName, String jobGroupName) {
-
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
 
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
         // 恢复触发器
         try {
             scheduler.resumeTrigger(triggerKey);
+            // 更新缓存状态
+            jobVo.setState(scheduler.getTriggerState(triggerKey).ordinal());
+            redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
             // 日志管理  添加恢复日志
-            logClients.info(jobGroupName,LogTemplate.resumeJobTemplate(jobName,jobGroupName));
+            logService.info(jobGroupName,LogTemplate.resumeJobTemplate(jobName,jobGroupName));
+
         } catch (SchedulerException e) {
             throw new SystemException(CodeEnum.QUARTZ_ERROR);
         }
@@ -169,6 +214,17 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     // region 任务修改
+    private void modifyCache(Trigger trigger,String jobName,Integer state){
+        // 更新缓存
+        JobVo jobVo = redisCache.getCacheMapValue(SystemConstant.CACHE_JOBS, jobName);
+        jobVo.setStartTime(trigger.getStartTime());
+        jobVo.setEndTime(trigger.getEndTime());
+        jobVo.setNextFireTime(trigger.getNextFireTime());
+        jobVo.setPreviousFireTime(trigger.getPreviousFireTime());
+
+        redisCache.setCacheMapValue(SystemConstant.CACHE_JOBS, jobName,jobVo);
+
+    }
     @Override
     public Result modifyJob(Integer radio, JobDto job) {
         try {
@@ -208,10 +264,12 @@ public class QuartzServiceImpl implements QuartzService {
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
                 // 日志
-                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                logService.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改开始时间为: "+oldTime+" -> "+newStartTime));
 
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(CodeEnum.JOB_MODIFY_ERROR,e.getMessage());
@@ -241,9 +299,11 @@ public class QuartzServiceImpl implements QuartzService {
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
                 // 日志
-                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                logService.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改结束时间为: "+oldTime+" -> "+ newEndTime));
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(CodeEnum.JOB_MODIFY_ERROR,e.getMessage());
@@ -273,10 +333,12 @@ public class QuartzServiceImpl implements QuartzService {
                 // 修改一个任务的触发时间
                 scheduler.rescheduleJob(triggerKey, trigger);
                 // 日志
-                logClients.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
+                logService.info(jobGroupName,LogTemplate.modifyJobTemplate(jobName,jobGroupName,
                         "修改定时规则为: "+oldTime+" -> "+ param));
 
             }
+            // 更新缓存
+            modifyCache(trigger,jobName,scheduler.getTriggerState(triggerKey).ordinal());
         } catch (Exception e) {
             // 处理异常
             throw new SystemException(CodeEnum.JOB_MODIFY_ERROR,e.getMessage());

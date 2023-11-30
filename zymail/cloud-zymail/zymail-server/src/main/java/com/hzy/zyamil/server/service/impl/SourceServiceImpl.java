@@ -2,7 +2,7 @@ package com.hzy.zyamil.server.service.impl;
 
 import com.hzy.zyamil.common.constant.SystemConstant;
 import com.hzy.zyamil.common.exception.SystemException;
-import com.hzy.zyamil.common.utils.CodeEnum;
+
 import com.hzy.zyamil.common.utils.Result;
 import com.hzy.zyamil.server.api.ZymailClientApi;
 import com.hzy.zyamil.server.config.ConfigProperties;
@@ -60,7 +60,7 @@ public class SourceServiceImpl implements SourceService {
             try {
                 zymailClientApi.heartCheck(appId);
             }catch (SystemException e){
-                throw new SystemException(CodeEnum.CLIENT_HEART_CHECK_FAILED);
+
             }
         }
     }

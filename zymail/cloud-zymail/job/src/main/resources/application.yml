@@ -7,3 +7,9 @@ spring:
   cloud:
     nacos:
       server-addr: 192.168.193.40:8848 # Nacos地址
+
+  redis:
+    host: 192.168.193.40
+    port: 6379
+    database: 0
+    password: 123456

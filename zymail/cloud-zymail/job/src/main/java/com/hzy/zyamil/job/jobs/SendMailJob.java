@@ -2,8 +2,8 @@ package com.hzy.zyamil.job.jobs;
 
 import com.hzy.zyamil.common.model.entity.Mail;
 import com.hzy.zyamil.common.utils.LogTemplate;
-import com.hzy.zyamil.job.clients.LogClients;
 import com.hzy.zyamil.job.clients.ZymailClient;
+import com.hzy.zyamil.job.service.LogService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class SendMailJob implements Job {
     @Autowired
     private ZymailClient zymailClient;
     @Autowired
-    private LogClients logClients;
+    private LogService logService;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -43,7 +43,7 @@ public class SendMailJob implements Job {
         if (jobExecutionContext.getNextFireTime() == null ||
                 jobExecutionContext.getNextFireTime().compareTo(new Date()) < 0){
             JobDetail jobDetail = jobExecutionContext.getJobDetail();
-            logClients.info(appId,
+            logService.info(appId,
                     LogTemplate.endJobTemplate(jobDetail.getKey().getName(),
                             jobDetail.getKey().getGroup(),
                             jobDetail.getJobClass()));
