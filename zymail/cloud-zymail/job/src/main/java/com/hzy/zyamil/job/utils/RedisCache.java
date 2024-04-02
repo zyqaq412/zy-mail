@@ -259,4 +259,26 @@ public class RedisCache
     {
         return redisTemplate.opsForHash().entries(key);
     }
+    public boolean setNx(String key, String value) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        Boolean result = valueOperations.setIfAbsent(key, value); // 使用setIfAbsent方法来执行SETNX命令
+        return result != null && result;
+    }
+    /**
+     * 设置键值对，并设置过期时间（单位：秒）
+     *
+     * @param key     键
+     * @param value   值
+     * @param timeout 过期时间（单位：秒）
+     * @return 设置成功返回 true，否则返回 false
+     */
+    public boolean setNx(String key, String value, long timeout) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        Boolean result = valueOperations.setIfAbsent(key, value); // 使用setIfAbsent方法来执行SETNX命令
+        if (result != null && result && timeout > 0) {
+            // 如果设置成功并且设置了过期时间，则设置键的过期时间
+            redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+        }
+        return result != null && result;
+    }
 }

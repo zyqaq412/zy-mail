@@ -15,4 +15,6 @@ public interface SystemConstant {
     Integer CACHE_EXPIRE_TIME = 1000 * 60 * 30;
 
     String CACHE_JOBS = "jobVos";
+
+    String Lock__JOB = "lock-job";
 }

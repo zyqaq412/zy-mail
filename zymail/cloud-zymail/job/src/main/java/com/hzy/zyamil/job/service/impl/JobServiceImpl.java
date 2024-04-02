@@ -84,17 +84,19 @@ public class JobServiceImpl implements JobService {
         Map<String, Object> hashAll = redisCache.getHashAll(SystemConstant.CACHE_JOBS);
         for (Map.Entry<String, Object> entry : hashAll.entrySet()) {
             JobVo jobVo = (JobVo) entry.getValue();
-            Map<String, Mail> params = new HashMap<>();
-            params.put("mail", jobVo.getMail());
+            if(redisCache.setNx(SystemConstant.Lock__JOB + jobVo.getJobName(),"",5)){
+                Map<String, Mail> params = new HashMap<>();
+                params.put("mail", jobVo.getMail());
 
-            loadJob(jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getJobName(), jobVo.getJobGroupName(),
-                    jobVo.getCron(), jobVo.getStartTime(), jobVo.getEndTime(), params);
+                loadJob(jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getJobName(), jobVo.getJobGroupName(),
+                        jobVo.getCron(), jobVo.getStartTime(), jobVo.getEndTime(), params);
 
-            modifyState(jobVo.getJobName(), jobVo.getJobGroupName(),jobVo.getState());
+                modifyState(jobVo.getJobName(), jobVo.getJobGroupName(),jobVo.getState());
 
-            logService.warning(jobVo.getJobGroupName(), LogTemplate.heavyLoadJobTemplate(
-                    jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getIpaddr()
-            ));
+                logService.warning(jobVo.getJobGroupName(), LogTemplate.heavyLoadJobTemplate(
+                        jobVo.getJobName(), jobVo.getJobGroupName(), jobVo.getIpaddr()
+                ));
+            }
         }
 
     }
