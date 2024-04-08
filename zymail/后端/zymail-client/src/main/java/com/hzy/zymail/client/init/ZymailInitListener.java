@@ -56,6 +56,7 @@ public class ZymailInitListener implements ApplicationListener<ContextRefreshedE
             throw new RuntimeException(e);
         }*/
 // 接入server
+        log.info("开始接入分布式邮件调度系统");
         Source source = new Source();
         source.setAppId(configProperties.getAppId());
         source.setHost(configProperties.getMail().getHost());

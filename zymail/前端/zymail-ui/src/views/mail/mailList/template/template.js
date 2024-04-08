@@ -1,6 +1,7 @@
 import mailApi from '@/api/mail/mailApl'
 import VueClipboard from 'vue-clipboard2';
-import  marked  from 'marked';
+import marked from 'marked';
+
 export default {
   mounted() {
     this.getTemplates();
@@ -8,16 +9,19 @@ export default {
   },
   data() {
     return {
-      templateList:[]
+      templateList: []
     }
   },
 
-  methods:{
-    getHtml(content){
-      return marked(content);
+  methods: {
+    getHtml(content) {
+      var temp = marked(content)
+      // console.log('content',content);
+      // console.log('temp',temp);
+      return temp;
     },
     getTemplates() {
-      mailApi.getTemplates().then(res=>{
+      mailApi.getTemplates().then(res => {
         this.templateList = res.data;
       })
     },
