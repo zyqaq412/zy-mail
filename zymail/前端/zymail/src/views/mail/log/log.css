@@ -1,0 +1,16 @@
+#table {
+  height: 75vh; /* 设置表格的高度为屏幕高度的100% */
+  /* 可以添加其他样式属性，例如滚动条、背景色等 */
+  overflow-y: auto; /* 如果表格内容过多，添加垂直滚动条 */
+}
+#head {
+  background-color: #f0f0f0; /* 设置表头背景颜色 */
+  border-bottom: 1px solid #ddd; /* 添加底部边框 */
+  padding: 10px; /* 添加内边距 */
+}
+
+/* 表体样式 */
+#body {
+  /* 如果需要添加背景色或其他样式，可以在这里添加 */
+  padding: 10px; /* 添加内边距 */
+}
