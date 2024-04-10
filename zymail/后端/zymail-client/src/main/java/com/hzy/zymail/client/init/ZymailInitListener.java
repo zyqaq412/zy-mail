@@ -2,6 +2,7 @@ package com.hzy.zymail.client.init;
 
 import com.hzy.zymail.client.api.ZymailServerApi;
 import com.hzy.zymail.client.config.ConfigProperties;
+import com.hzy.zymail.client.constant.AppHttpCodeEnum;
 import com.hzy.zymail.client.model.entity.Source;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,12 @@ public class ZymailInitListener implements ApplicationListener<ContextRefreshedE
         try {
             host = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            if (configProperties.getAccess()){
+                throw new RuntimeException(AppHttpCodeEnum.Access_ERROR.getMsg());
+            }else{
+                log.info(AppHttpCodeEnum.Access_ERROR.getMsg());
+            }
+
         }
         source.setUrl(String.format("http://%s:%s%s", host, port, contextPath));
 

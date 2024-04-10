@@ -21,6 +21,7 @@ public class ConfigProperties {
 
     private ServerProperties server = new ServerProperties();
 
+    private Boolean Access = false;
 
     @Data
     public class MailProperties {

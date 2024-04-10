@@ -12,7 +12,8 @@ public enum AppHttpCodeEnum {
     // 成功
     SUCCESS(200,"操作成功"),
 
-    SYSTEM_ERROR(500,"出现错误");
+    SYSTEM_ERROR(500,"出现错误"),
+    Access_ERROR(501,"服务器接入失败");
 
 
 
