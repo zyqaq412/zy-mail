@@ -56,6 +56,9 @@ public class ZymailInitListener implements ApplicationListener<ContextRefreshedE
         } catch (Exception e) {
             throw new RuntimeException(e);
         }*/
+        if (!configProperties.getAccess()) {
+            return;
+        }
 // 接入server
         log.info("开始接入分布式邮件调度系统");
         Source source = new Source();
@@ -66,12 +69,7 @@ public class ZymailInitListener implements ApplicationListener<ContextRefreshedE
         try {
             host = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            if (configProperties.getAccess()){
-                throw new RuntimeException(AppHttpCodeEnum.Access_ERROR.getMsg());
-            }else{
-                log.info(AppHttpCodeEnum.Access_ERROR.getMsg());
-            }
-
+            throw new RuntimeException(AppHttpCodeEnum.Access_ERROR.getMsg());
         }
         source.setUrl(String.format("http://%s:%s%s", host, port, contextPath));
 
