@@ -28,10 +28,17 @@ public class ZymailClient {
     private JavaMailSender javaMailSender;
     @Autowired
     private ConfigProperties configProperties;
+    @Autowired
+    private ZymailServerApi zymailServerApi;
 
     @Async
     public void sendMail(Mail mail){
         try {
+            if (mail.getTimer()){
+                mail.setSource(configProperties.getAppId());
+                zymailServerApi.sendMail(mail);
+                return;
+            }
             // 创建简单邮件消息
             MimeMessage message  = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);

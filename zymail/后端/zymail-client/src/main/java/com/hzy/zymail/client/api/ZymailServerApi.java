@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hzy.zymail.client.config.ConfigProperties;
 import com.hzy.zymail.client.constant.AppHttpCodeEnum;
 import com.hzy.zymail.client.constant.SystemException;
+import com.hzy.zymail.client.model.entity.Mail;
 import com.hzy.zymail.client.model.entity.Source;
 import com.hzy.zymail.client.utils.HttpClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,15 @@ public class ZymailServerApi {
             heartCheck();
             httpClientUtils.put(configProperties.getServer().getUrl()+ "/sources",
                     JSONObject.toJSONString(source));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void sendMail(Mail mail) {
+        try {
+            heartCheck();
+            httpClientUtils.post(configProperties.getServer().getUrl()+ "/mails",
+                    JSONObject.toJSONString(mail));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

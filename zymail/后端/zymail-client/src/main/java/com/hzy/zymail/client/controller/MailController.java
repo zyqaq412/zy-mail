@@ -24,6 +24,7 @@ public class MailController {
 
     @PostMapping
     public Result sendEmail(@RequestBody Mail mail) {
+        mail.setTimer(false);
         zymailClient.sendMail(mail);
         return Result.okResult();
     }
